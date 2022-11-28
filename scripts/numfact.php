@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU AGPL
  * along with this program.  If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
  */
-
+if (! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1'); // Disables token renewal
 
 $res=0;
 if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.php';
@@ -26,7 +26,7 @@ require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.product.class.php';
 
 $tiers = new Societe($db);
-$tiers->fetch($_POST['tiers']);
+$tiers->fetch($_GET['tiers']);
 
 $facture = new FactureFournisseur($db);
 $facture->ref = $facture->getNextNumRef($tiers);

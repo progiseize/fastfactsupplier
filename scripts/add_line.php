@@ -16,11 +16,13 @@
  * You should have received a copy of the GNU AGPL
  * along with this program.  If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
  */
-
+if (! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1'); // Disables token renewal
 
 $res=0;
 if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.php';
 if (! $res && file_exists("../../../main.inc.php")) $res=@include '../../../main.inc.php';
+
+
 
 /*******************************************************************
 * FONCTIONS
@@ -76,7 +78,7 @@ $version = explode('.', DOL_VERSION);
 if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
 
 if($show_extrafields_factureline): $extrafields->fetch_name_optionals_label('facture_fourn_det'); endif; // LIGNES FACTURE
-$nb_exttrafields = array_count_values($extrafields->attribute_elementtype);
+$nb_exttrafields = $extrafields->attribute_elementtype?array_count_values($extrafields->attribute_elementtype):0;
 
 $array_not_show = array(-1,0,2);
 
@@ -86,10 +88,10 @@ include_once('../lib/functions.lib.php');
 
 ?>
 
-<tr id="linefact-<?php echo $_POST['viewnumber'] ?>" class="oddeven pgsz-optiontable-tr linefact">
+<tr id="linefact-<?php echo GETPOST('viewnumber') ?>" class="oddeven pgsz-optiontable-tr linefact">
     <td class="pgsz-optiontable-field">
-        <input type="hidden" name="infofact-saisie-<?php echo $_POST['viewnumber']; ?>" id="infofact-saisie-<?php echo $_POST['viewnumber']; ?>" value="" >
-        <?php echo ffs_select_prodserv($tab_prodserv,$_POST['viewnumber'],'',$input_errors); ?>
+        <input type="hidden" name="infofact-saisie-<?php echo GETPOST('viewnumber'); ?>" id="infofact-saisie-<?php echo GETPOST('viewnumber'); ?>" value="" >
+        <?php echo ffs_select_prodserv($tab_prodserv,GETPOST('viewnumber'),'',$input_errors); ?>
     </td>
     <?php if($show_extrafields_factureline && $nb_exttrafields['facture_fourn_det'] > 0): ?>
         <?php foreach($extrafields->attribute_label as $key => $label): if($extrafields->attribute_elementtype[$key] == 'facture_fourn_det' && !in_array($extrafields->attribute_list[$key], $array_not_show) ): ?>
@@ -99,14 +101,14 @@ include_once('../lib/functions.lib.php');
                     if($key == $conf->global->SRFF_EXTRAFACTLINE_PROJECT): $class_field .= ' ffs-lineproject'; endif;
                     if(in_array($extrafields->attribute_type[$key], array('select','sellist'))): $class_field .= ' ffs-slct'; endif;
                 ?>
-                <?php echo $extrafields->showInputField($key,$value_extrafield,'style="width:95%;"','-'.$_POST['viewnumber'],'',$class_field,$facture->id); ?>
+                <?php echo $extrafields->showInputField($key,$value_extrafield,'style="width:95%;"','-'.GETPOST('viewnumber'),'',$class_field,$facture->id); ?>
             </td>
         <?php endif; endforeach; ?>
     <?php endif; ?>
-    <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo $_POST['viewnumber']; ?>" id="infofact-montantht-<?php echo $_POST['viewnumber']; ?>" class="calc-amount" value="" data-mode="ht" data-linenum="<?php echo $_POST['viewnumber']; ?>" /></td>
-    <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo $_POST['viewnumber']; ?>" id="infofact-montantttc-<?php echo $_POST['viewnumber']; ?>" class="calc-amount" value="" data-mode="ttc" data-linenum="<?php echo $_POST['viewnumber']; ?>" /></td> 
+    <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ht" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td>
+    <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ttc" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td> 
     <td class="pgsz-optiontable-field right">
-        <?php if(!empty($tab_tva)): echo ffs_select_tva($tab_tva,$_POST['viewnumber']);
+        <?php if(!empty($tab_tva)): echo ffs_select_tva($tab_tva,GETPOST('viewnumber'));
         else: echo $langs->transnoentities('ffs_noVAT');
         endif; ?>
     </td>

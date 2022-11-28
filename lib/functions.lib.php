@@ -109,7 +109,7 @@ function ffs_select_tva($tab_tva,$numero_ligne,$value = 'default'){
 
     global $db, $conf;
 
-    $select = '<select name="infofact-tva-'.$numero_ligne.'" id="infofact-tva-'.$numero_ligne.'" class="calc-tva" data-linenum="'.$numero_ligne.'">';
+    $select = '<select name="infofact-tva-'.$numero_ligne.'" id="infofact-tva-'.$numero_ligne.'" class="calc-tva minwidth100" data-linenum="'.$numero_ligne.'">';
 
     foreach ($tab_tva as $taux_tva):
         $select .= '<option value="'.$taux_tva.'" ';
@@ -195,7 +195,7 @@ function ffs_getListFourn($selected = '',$next_code_fournisseur){
     while($f = $db->fetch_object($fourns)):
         $options .= '<option ';
         if($selected == $f->nom): $options .= 'selected="selected" '; endif;
-        $options .= 'value="'.$f->nom.'" data-fournid="'.$f->rowid.'" data-codefourn="'.$f->code_fournisseur.'" >'.$f->nom.'</option>';
+        $options .= 'value="'.$f->rowid.'" data-fournid="'.$f->rowid.'" data-codefourn="'.$f->code_fournisseur.'" >'.$f->nom.'</option>';
         array_push($list_fourns, $f->nom);
     endwhile;
     if(!empty($selected) && !in_array($selected, $list_fourns)):

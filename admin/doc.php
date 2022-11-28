@@ -60,7 +60,7 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfac
     <?php else : ?>
         <table class="centpercent notopnoleftnoright table-fiche-title"><tbody><tr class="titre"><td class="nobordernopadding widthpictotitle valignmiddle col-picto"><span class="fas fa-file-invoice-dollar valignmiddle widthpictotitle pictotitle" style=""></span></td><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><?php echo $langs->transnoentities('ffs_page_title'); ?></div></td></tr></tbody></table>
     <?php endif; ?>
-    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'doc','FastFactSupplier', 0,'progiseize@progiseize'); ?>
+    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'doc','FastFactSupplier', 0,'fa-file-invoice-dollar_file-invoice-dollar_fas_#263c5c'); ?>
 
      <table class="noborder centpercent pgsz-option-table" style="border-top:none;">
         <tbody>
