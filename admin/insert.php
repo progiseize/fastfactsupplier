@@ -35,6 +35,7 @@ if(!$user->rights->fastfactsupplier->configurer): accessforbidden(); endif;
 /*******************************************************************/
 // VARIABLES
 /*******************************************************************/
+$version = explode('.', DOL_VERSION);
 $ccs = array(
     '606110' => "Eau",
     '606120' => "Gaz",
@@ -86,7 +87,7 @@ $all_cats = $cats->get_all_categories();
 /*******************************************************************/
 $action = GETPOST('action');
 
-if ($action == 'insert'):
+if ($action == 'insert' && GETPOST('token') == $_SESSION['token']):
 
     $cat = GETPOST('cats-ids');
     $tab_cc = GETPOST('tab_cc');
@@ -147,7 +148,9 @@ if ($action == 'insert'):
             $id_aa = $accountingaccount->create($user);
             if($id_aa > 0): 
 
-                $accountingaccount->account_activate($id_aa,0);
+                if(intval($version[0]) <= 14): $accountingaccount->account_activate($id_aa,0);
+                else: $accountingaccount->accountActivate($id_aa,0);
+                endif;
 
                 setEventMessages('<span style="font-weight:bold;">'.$accountingaccount->label.'</span> : Code comptable inséré.', null, 'mesgs');
 
@@ -169,7 +172,7 @@ if ($action == 'insert'):
                     $id_prodx = $prodx->create($user);
                     if($id_prodx > 0):
 
-                        setEventMessages('<span style="font-size:0.75em;"><span style="font-weight:bold;">'.$accountingaccount->label.'</span> : Le produit a été créé.</span><br/>', null, 'mesgs');
+                        setEventMessages('<span style="font-size:0.75em;"><span style="font-weight:bold;">'.$accountingaccount->label.'</span> : Le service a été créé.</span><br/>', null, 'mesgs');
 
                         // ON ASSIGNE LA CATEGORIE SI DEFINIE
                         if(!empty($def_cat)):
@@ -178,7 +181,7 @@ if ($action == 'insert'):
                         endif;
 
                     else:
-                        setEventMessages('<span style="font-weight:bold;">'.$accountingaccount->label.'</span> : Une erreur est survenue lors de la création du produit.', null, 'errors');
+                        setEventMessages('<span style="font-weight:bold;">'.$accountingaccount->label.'</span> : Une erreur est survenue lors de la création du service.', null, 'errors');
                     endif;
 
                 endif;
@@ -218,6 +221,7 @@ llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',array("/fastfactsupplier
 
         <form enctype="multipart/form-data" action="<?php print $_SERVER["PHP_SELF"]; ?>" method="post" id="">
             <input type="hidden" name="action" value="insert">
+            <input type="hidden" name="token" value="<?php echo newtoken(); ?>">
 
             <?php //var_dump($tab_img); ?>
 

@@ -4,8 +4,12 @@
 [comment]: <> (Extrafields : type unique ne fonctionnent pas)
 [comment]: <> (Extrafields : Prise en compte de la taille des champs)
 [comment]: <> (Verification des infos fournisseurs sur societeinfo ?)
+[comment]: <> (3.0 -> Interopérabilité ScanInvoice)
 
 ***
+### 2.6.5 (28/11/2022)
+* MAJ - Compatibilité MAIN_SECURITY_CSRF_TOKEN_RENEWAL_ON_EACH_CALL 
+
 ### 2.6.4 (29/09/2022)
 * MAJ - Modification des permissions, pensez à verifier les droits utilisateurs
 
