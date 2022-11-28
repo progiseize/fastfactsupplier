@@ -52,9 +52,11 @@ $extrafields->fetch_name_optionals_label('facture_fourn_det');
 
 //
 $extras_factureligne = array();
-foreach($extrafields->attribute_elementtype as $key => $type):
-    if($type == 'facture_fourn_det' && $extrafields->attribute_list[$key]): array_push($extras_factureligne, $key); endif;
-endforeach;
+if(!empty($extrafields->attribute_elementtype)):
+    foreach($extrafields->attribute_elementtype as $key => $type):
+        if($type == 'facture_fourn_det' && $extrafields->attribute_list[$key]): array_push($extras_factureligne, $key); endif;
+    endforeach;
+endif;
 
 $sql_checkconst = "SELECT rowid FROM ".MAIN_DB_PREFIX."const";
 $sql_checkconst .= " WHERE name IN (";

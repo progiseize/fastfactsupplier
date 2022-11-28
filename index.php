@@ -119,7 +119,7 @@ $action = GETPOST('action');
 // ON RECUPERE LES LABELS DES EXTRAFIELDS $FACTURE (FOURNISSEUR)
 if($show_extrafields_facture): $extralabels_facture = $extrafields->fetch_name_optionals_label($facture->table_element); endif;
 if($show_extrafields_factureline): $extralabels_factureligne = $extrafields->fetch_name_optionals_label($facture_ligne->table_element); endif; // LIGNES FACTURE
-$nb_exttrafields = array_count_values($extrafields->attribute_elementtype);
+$nb_exttrafields = $extrafields->attribute_elementtype?array_count_values($extrafields->attribute_elementtype):0;
 $extraf_visibletab = array('1','3'); 
 
 /*******************************************************************
