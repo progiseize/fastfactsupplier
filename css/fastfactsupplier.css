@@ -1,0 +1,47 @@
+/* 
+ * Copyright (C) 2022 ProgiSeize <contact@progiseize.fr>
+ *
+ * This program and files/directory inner it is free software: you can 
+ * redistribute it and/or modify it under the terms of the 
+ * GNU Affero General Public License (AGPL) as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU AGPL for more details.
+ *
+ * You should have received a copy of the GNU AGPL
+ * along with this program.  If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ */
+
+.fastfact .liste_titre th {background: #f6f6f6;}
+
+.fastfact-hidden {display: none;}
+.fastfact-button {background: #051641;color: #fff;font-weight: 600;font-size: 14px;font-family: 'Poppins', sans-serif;text-transform: uppercase;cursor: pointer;border-radius: 2px;}
+.fastfact-button:hover {background: #020d29;}
+.fastfact-button.btn-alt {background: #fb2a52;}
+.fastfact-button.btn-alt:hover {background: #d4193d;}
+.fastfact-button.btn-small {font-size: 11px;}
+.ffs-bold {font-weight: 600;}
+.ffs-bold .ff-amount {font-weight: 400;}
+.ffs-nopadding {padding: 0 !important;}
+.fastfact-table .redirect-active {font-size: 0.85em;color: #68d46b;margin-right: 6px;font-weight: 500;display: none;}
+.fastfact-table .redirect-active.show {display: inline-block;}
+
+#pgsz-option .fastfact-table tr.pgsz-optiontable-tr:hover td {background: #fff;}
+
+#fastfact-actions {text-align: right;}
+#fastfact-actions input[type="button"] {background: #b22525 !important;color: #fff;border: none;text-transform: uppercase;font-size: 13px;padding: 6px 10px;font-weight: bold;margin-top: 12px;cursor: pointer;}
+#fastfact-actions input[type="button"]:hover {background: #851919 !important;}
+#fastfact-actions input[type="submit"] {background: #5a8ea8 !important;color: #fff;border: none;text-transform: uppercase;font-size: 13px;padding: 6px 10px;font-weight: bold;margin-top: 12px;cursor: pointer;}
+#fastfact-actions input[type="submit"]:hover {background: #446c80 !important;}
+
+#zone-drop {position: relative;background: #fcfcfc;border-left: 1px dashed #e0e0e0;border-right: 1px dashed #e0e0e0;}
+#zone-drop #zone-drop-infos {padding: 64px 36px;text-align: center;text-transform: uppercase;font-weight: 300;font-size: 16px;color: #bbb;}
+#zone-drop #zone-drop-infos .bold {font-weight: 700;color: #aaa}
+#zone-drop #creafact-file {position: absolute;top:0;left:0;right:0;bottom:0;width: 100%;opacity: 0;margin: 0;padding: 0;box-sizing: border-box;cursor: pointer;}
+
+.ffs-fielderror {border-bottom: 1px solid red !important;}
+.select2-selection.select2-selection--single.ffs-fielderror {border-bottom: 1px solid red;}
