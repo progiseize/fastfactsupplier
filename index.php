@@ -15,6 +15,7 @@
  *
  * You should have received a copy of the GNU AGPL
  * along with this program.  If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+
  */
 
 $res=0;
@@ -105,7 +106,7 @@ $redirect = GETPOST('creafact-redirect'); if($redirect): $gotoreg = $redirect; e
 // Gestion des erreurs & securite
 $errmsg = array();
 $input_errors = array();
-$security_token = GETPOST('security_token');
+$token = GETPOST('token');
 
 // Déclaration de variables utiles
 $nb_lines = 0;
@@ -126,7 +127,7 @@ $extraf_visibletab = array('1','3');
 * ACTIONS
 ********************************************************************/
 
-if ($action == 'create'):
+if ($action == 'create' && $token == $_SESSION['token']):
 
     $db->begin();
 
@@ -137,14 +138,6 @@ if ($action == 'create'):
     if (!GETPOST("creatiers-nom")): $error++; array_push($input_errors, 'creatiers-nom'); array_push($errmsg,$langs->transnoentities("ErrorFieldRequired", $langs->transnoentities('ffs_field_tiersname'))); endif;
     if (!GETPOST("creatiers-codefournisseur")): $error++; array_push($input_errors, 'creatiers-codefournisseur'); array_push($errmsg,$langs->transnoentities("ErrorFieldRequired", $langs->transnoentities('ffs_field_codefourn'))); endif;
     if (!GETPOST("creafact-reffourn")): $error++; array_push($input_errors, 'creafact-reffourn'); array_push($errmsg,$langs->transnoentities("ErrorFieldRequired", $langs->transnoentities('ffs_field_reffourn'))); endif;
-    
-    if (GETPOST("creafact-reffourn")):
-        $facture_reffourn = GETPOST("creafact-reffourn");
-        $sql_checkref = "SELECT rowid FROM ".MAIN_DB_PREFIX."facture_fourn WHERE ref_supplier = '$facture_reffourn'";
-        $result_checkref = $db->query($sql_checkref);$count_checkref = $db->num_rows($result_checkref);
-        if($count_checkref > 0):$error++; array_push($input_errors, 'creafact-reffourn'); array_push($errmsg,$langs->transnoentities('ffs_fielderror_reffourn_exist'));endif;
-    endif;
-
     if (!GETPOST("creafact-datefact")): $error++; array_push($input_errors, 'creafact-datefact'); array_push($errmsg,$langs->transnoentities("ErrorFieldRequired", $langs->transnoentities('ffs_field_date'))); endif;
     if (!GETPOST("creafact-datelim")): $error++; array_push($input_errors, 'creafact-datelim'); array_push($errmsg,$langs->transnoentities("ErrorFieldRequired", $langs->transnoentities('ffs_field_datelim'))); endif;
     if (GETPOST("creafact-datefact") && GETPOST("creafact-datelim")):
@@ -365,125 +358,138 @@ if ($action == 'create'):
         /**********************************************************/
         /* FACTURE*/
         /**********************************************************/
-        $date_facturation_tmp = explode('/', GETPOST('creafact-datefact'));
-        $date_facturation = mktime('0','0','1',$date_facturation_tmp[1],$date_facturation_tmp[0],$date_facturation_tmp[2]);
-        $date_limit_tmp = explode('/', GETPOST('creafact-datelim'));
-        $date_limit = mktime('0','0','1',$date_limit_tmp[1],$date_limit_tmp[0],$date_limit_tmp[2]);
 
-        $facture->socid = $societe->id;
-        $facture->ref = $facture->getNextNumRef($societe);
-        $facture->ref_supplier = $facture_reffourn;
-        $facture->libelle = GETPOST('creafact-libelle','alpha');
-        $facture->date = $date_facturation;
-        $facture->date_echeance = $date_limit;
-        $facture->entity = $conf->entity;
+        if (GETPOST("creafact-reffourn")):
+            $facture_reffourn = GETPOST("creafact-reffourn");
+            $sql_checkref = "SELECT rowid FROM ".MAIN_DB_PREFIX."facture_fourn WHERE ref_supplier = '$facture_reffourn' AND fk_soc = '$societe->id'";
+            $result_checkref = $db->query($sql_checkref);$count_checkref = $db->num_rows($result_checkref);
+            if($count_checkref > 0):$error++; array_push($input_errors, 'creafact-reffourn'); array_push($errmsg,$langs->transnoentities('ffs_fielderror_reffourn_exist'));endif;
+        endif;
 
-        $facture->cond_reglement_id = $societe->cond_reglement_supplier_id;
-        $facture->mode_reglement_id = $societe->mode_reglement_supplier_id;
-        
-        // ON AJOUTE LES EXTRAFIELDS A LA FACTURE
-        if($show_extrafields_facture):
-            $facture->array_options = array();
-            foreach($extralabels_facture as $key_exf => $exf):
-                if(GETPOSTISSET('options_'.$key_exf)):
-                    $facture->array_options['options_'.$key_exf] = GETPOST('options_'.$key_exf);
-                endif;
-            endforeach;
-        endif;      
+        if(!$error):
 
-        $facture_id = $facture->create($user); if($facture_id < 0): $error++; endif;
-        
-        $lines_ok = 0;
+            $date_facturation_tmp = explode('/', GETPOST('creafact-datefact'));
+            $date_facturation = mktime('0','0','1',$date_facturation_tmp[1],$date_facturation_tmp[0],$date_facturation_tmp[2]);
+            $date_limit_tmp = explode('/', GETPOST('creafact-datelim'));
+            $date_limit = mktime('0','0','1',$date_limit_tmp[1],$date_limit_tmp[0],$date_limit_tmp[2]);
 
-        // POUR CHAQUE LIGNE DE FACTURE
-        for ($i=1; $i <= $nb_lines; $i++):
+            // 
 
-            // ON FAIT LES CALCULS DE BASE
-            switch($mode_calcul):
-                case 'ht':
-                    $montant_ligne = floatval(str_replace(',','.',GETPOST('infofact-montantht-'.$i)));
-                    $typesaisie_ligne = $mode_calcul;
-                break;
-                case 'ttc':
-                    $montant_ligne = floatval(str_replace(',','.',GETPOST('infofact-montantttc-'.$i)));
-                    $typesaisie_ligne = $mode_calcul;
-                break;
-                case 'both':
-                    $typesaisie_ligne = GETPOST('infofact-saisie-'.$i);
-                    switch($typesaisie_ligne):
-                        case 'ht': $montant_ligne = floatval(str_replace(',','.',GETPOST('infofact-montantht-'.$i))); break;
-                        case 'ttc': $montant_ligne = floatval(str_replace(',','.',GETPOST('infofact-montantttc-'.$i))); break;
-                    endswitch;
-                break;
-            endswitch;
+            $facture->socid = $societe->id;
+            $facture->ref = $facture->getNextNumRef($societe);
+            $facture->ref_supplier = $facture_reffourn;
+            $facture->libelle = GETPOST('creafact-libelle','alpha');
+            $facture->date = $date_facturation;
+            $facture->date_echeance = $date_limit;
+            $facture->entity = $conf->entity;
 
-            $creafact_tva = number_format(floatval(GETPOST('infofact-tva-'.$i)),3,'.','');
-
-            if($use_server_list): $creafact_fk_product = GETPOST('infofact-prodserv-'.$i); $creafact_description = '';
-            else: $creafact_fk_product = 0; $creafact_description = GETPOST('infofact-prodserv-'.$i);
-            endif;
-
-            // ON AJOUTE UNE LIGNE DE FACTURE
-            if($id_ligne = $facture->addline($creafact_description,$montant_ligne,$tva = $creafact_tva,$txlocaltax1 = 0,$txlocaltax2 = 0,$qty = 1,$creafact_fk_product,$remise_percent = 0,$date_start = '',$date_end = '',$ventil = 0,$info_bits = '',strtoupper($typesaisie_ligne),$type = 1,$rang = -1,$notrigger = false,'',$fk_unit = null,$origin_id = 0,$pu_ht_devise = 0)):
-                $lines_ok++;
-
-                /********************/
-                $facture_ligne->fetch($id_ligne);
-
-                if($show_extrafields_factureline):
-                    foreach($extralabels_factureligne as $key_exfl => $exfl):
-                        if(GETPOSTISSET('options_'.$key_exfl.'-'.$i)):
-                            $facture_ligne->array_options['options_'.$key_exfl] = GETPOST('options_'.$key_exfl.'-'.$i);
-                        endif;
-                    endforeach;
-                    if(!empty($facture_ligne->array_options)):
-                        if(!$facture_ligne->insertExtraFields()): $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_saveextraslines')); endif;
+            $facture->cond_reglement_id = $societe->cond_reglement_supplier_id;
+            $facture->mode_reglement_id = $societe->mode_reglement_supplier_id;
+            
+            // ON AJOUTE LES EXTRAFIELDS A LA FACTURE
+            if($show_extrafields_facture):
+                $facture->array_options = array();
+                foreach($extralabels_facture as $key_exf => $exf):
+                    if(GETPOSTISSET('options_'.$key_exf)):
+                        $facture->array_options['options_'.$key_exf] = GETPOST('options_'.$key_exf);
                     endif;
+                endforeach;
+            endif;      
+
+            $facture_id = $facture->create($user); if($facture_id < 0): $error++; endif;
+            
+            $lines_ok = 0;
+
+            // POUR CHAQUE LIGNE DE FACTURE
+            for ($i=1; $i <= $nb_lines; $i++):
+
+                // ON FAIT LES CALCULS DE BASE
+                switch($mode_calcul):
+                    case 'ht':
+                        $montant_ligne = floatval(str_replace(',','.',GETPOST('infofact-montantht-'.$i)));
+                        $typesaisie_ligne = $mode_calcul;
+                    break;
+                    case 'ttc':
+                        $montant_ligne = floatval(str_replace(',','.',GETPOST('infofact-montantttc-'.$i)));
+                        $typesaisie_ligne = $mode_calcul;
+                    break;
+                    case 'both':
+                        $typesaisie_ligne = GETPOST('infofact-saisie-'.$i);
+                        switch($typesaisie_ligne):
+                            case 'ht': $montant_ligne = floatval(str_replace(',','.',GETPOST('infofact-montantht-'.$i))); break;
+                            case 'ttc': $montant_ligne = floatval(str_replace(',','.',GETPOST('infofact-montantttc-'.$i))); break;
+                        endswitch;
+                    break;
+                endswitch;
+
+                $creafact_tva = number_format(floatval(GETPOST('infofact-tva-'.$i)),3,'.','');
+
+                if($use_server_list): $creafact_fk_product = GETPOST('infofact-prodserv-'.$i); $creafact_description = '';
+                else: $creafact_fk_product = 0; $creafact_description = GETPOST('infofact-prodserv-'.$i);
                 endif;
 
+                // ON AJOUTE UNE LIGNE DE FACTURE
+                if($id_ligne = $facture->addline($creafact_description,$montant_ligne,$tva = $creafact_tva,$txlocaltax1 = 0,$txlocaltax2 = 0,$qty = 1,$creafact_fk_product,$remise_percent = 0,$date_start = '',$date_end = '',$ventil = 0,$info_bits = '',strtoupper($typesaisie_ligne),$type = 1,$rang = -1,$notrigger = false,'',$fk_unit = null,$origin_id = 0,$pu_ht_devise = 0)):
+                    $lines_ok++;
+
+                    /********************/
+                    $facture_ligne->fetch($id_ligne);
+
+                    if($show_extrafields_factureline):
+                        foreach($extralabels_factureligne as $key_exfl => $exfl):
+                            if(GETPOSTISSET('options_'.$key_exfl.'-'.$i)):
+                                $facture_ligne->array_options['options_'.$key_exfl] = GETPOST('options_'.$key_exfl.'-'.$i);
+                            endif;
+                        endforeach;
+                        if(!empty($facture_ligne->array_options)):
+                            if(!$facture_ligne->insertExtraFields()): $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_saveextraslines')); endif;
+                        endif;
+                    endif;
 
 
-            // SI IL Y A UNE ERREUR
-            else: $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_saveline',$i));
+
+                // SI IL Y A UNE ERREUR
+                else: $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_saveline',$i));
+                endif;
+
+            endfor;
+
+            if($nb_lines == $lines_ok):                
+                $valid_facture = $facture->validate($user); if($valid_facture < 0): $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_validateinvoice')); endif;
             endif;
-
-        endfor;
-
-        if($nb_lines == $lines_ok):                
-            $valid_facture = $facture->validate($user); if($valid_facture < 0): $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_validateinvoice')); endif;
-        endif;
         
-        // ON AJOUTE LE DOCUMENT LIE SI IL Y EN A UN
-        $link_url = GETPOST('creafact-linkurl');                                
-        if(!empty($link_url)):
+            // ON AJOUTE LE DOCUMENT LIE SI IL Y EN A UN
+            $link_url = GETPOST('creafact-linkurl');                                
+            if(!empty($link_url)):
 
-            // ON RECUPERE LE LIBELLE DU DOC, SI IL N'Y EN A PAS ON LE CREE
-            $link_lib = GETPOST('creafact-linklib');
-            if(empty($link_lib)): $link_lib = 'linkfile_'.date('Ymd').'_'.date('His'); endif;
+                // ON RECUPERE LE LIBELLE DU DOC, SI IL N'Y EN A PAS ON LE CREE
+                $link_lib = GETPOST('creafact-linklib');
+                if(empty($link_lib)): $link_lib = 'linkfile_'.date('Ymd').'_'.date('His'); endif;
 
-            $sql = "INSERT INTO ".MAIN_DB_PREFIX."links (url,objecttype,objectid,datea,label)";
-            $sql .= " VALUES ('".$link_url."','invoice_supplier','".$facture_id."','".date('Y-m-d H:i:s')."','".$link_lib."')";
+                $sql = "INSERT INTO ".MAIN_DB_PREFIX."links (url,objecttype,objectid,datea,label)";
+                $sql .= " VALUES ('".$link_url."','invoice_supplier','".$facture_id."','".date('Y-m-d H:i:s')."','".$link_lib."')";
 
-            if(!$db->query($sql)): $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_linkfile')); 
-            else: if($usecustomfield_uploadfile): $facture->array_options['options_ffs_uploadfile'] = 1; endif;
+                if(!$db->query($sql)): $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_linkfile')); 
+                else: if($usecustomfield_uploadfile): $facture->array_options['options_ffs_uploadfile'] = 1; endif;
+                endif;
+
             endif;
 
-        endif;
+            if(isset($_FILES) && !empty($_FILES['creafact-file']['name'])):
 
-        if(isset($_FILES) && !empty($_FILES['creafact-file']['name'])):
+                // ON DEFINIT LES REPERTOIRES DES FICHIERS
+                $upload_dir = $conf->fournisseur->facture->dir_output.'/'.get_exdir($facture_id,2,0,0,$facture,'invoice_supplier').$facture->ref .'/';
 
-            // ON DEFINIT LES REPERTOIRES DES FICHIERS
-            $upload_dir = $conf->fournisseur->facture->dir_output.'/'.get_exdir($facture_id,2,0,0,$facture,'invoice_supplier').$facture->ref .'/';
+                // ON CREE LES REPERTOIRES (S'ILS N'EXISTENT PAS )
+                if(!is_dir($upload_dir)): mkdir($upload_dir, 0777, true); endif;
 
-            // ON CREE LES REPERTOIRES (S'ILS N'EXISTENT PAS )
-            if(!is_dir($upload_dir)): mkdir($upload_dir, 0777, true); endif;
+                $upload_file = $upload_dir .$facture->ref.'-'.basename($_FILES['creafact-file']['name']);
 
-            $upload_file = $upload_dir .$facture->ref.'-'.basename($_FILES['creafact-file']['name']);
+                if(!move_uploaded_file($_FILES['creafact-file']['tmp_name'], $upload_file)): $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_notuploadfile'));
+                else: if($usecustomfield_uploadfile): $facture->array_options['options_ffs_uploadfile'] = 1; endif;
+                endif;
 
-            if(!move_uploaded_file($_FILES['creafact-file']['tmp_name'], $upload_file)): $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_notuploadfile'));
-            else: if($usecustomfield_uploadfile): $facture->array_options['options_ffs_uploadfile'] = 1; endif;
             endif;
-
         endif;
 
     endif;
@@ -546,7 +552,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
     <?php else : ?>
         <table class="centpercent notopnoleftnoright table-fiche-title"><tbody><tr class="titre"><td class="nobordernopadding widthpictotitle valignmiddle col-picto"><span class="fas fa-file-invoice-dollar valignmiddle widthpictotitle pictotitle" style=""></span></td><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><?php echo $langs->transnoentities('ffs_page_title'); ?></div></td></tr></tbody></table>
     <?php endif; ?>
-    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'saisir','FastFactSupplier', 0,'progiseize@progiseize'); ?>
+    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'saisir','FastFactSupplier', 0,'fa-file-invoice-dollar_file-invoice-dollar_fas_#263c5c'); ?>
 
     <?php if($user->rights->fastfactsupplier->saisir): ?>
     <form enctype="multipart/form-data" action="<?php print $_SERVER["PHP_SELF"]; ?>" method="post">
@@ -555,7 +561,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
         <input type="hidden" name="new_reffourn" id="new_reffourn" value="<?php echo $societe->code_fournisseur; ?>">
         <input type="hidden" name="is-already" id="is-already" value="0">
         <input type="hidden" name="fournid" id="fournid" value="">
-        <input type="hidden" name="security_token" id="security_token" value="<?php echo $_SESSION['newtoken']; ?>">
+        <input type="hidden" name="token" id="token" value="<?php echo newtoken(); ?>">
         <input type="hidden" name="infofact-linenumber" id="infofact-linenumber" value="<?php if($nb_lines == 0): echo '1'; else: echo $nb_lines; endif; ?>">
         <input type="hidden" name="ffs_amout_mode" value="<?php echo $conf->global->SRFF_AMOUNT_MODE; ?>">
 
@@ -637,7 +643,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                         <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_infosgen_actions_setproject'); ?></td>
                         <td class="right pgsz-optiontable-field">
                             <?php $options_creafact_projet = $formproject->select_projects_list(-1,$selected = '','creafact-projet',$maxlength = '',$option_only = 1,$show_empty = 1,$discard_closed = 1,$forcefocus = 0,$disabled = 0,$mode = 1,$filterkey = '',$nooutput = 1,$forceaddid = 0,$morecss = '',$htmlid = '' );?>
-                            <select id="creafact-projet" name="creafact-projet">
+                            <select id="creafact-projet" name="creafact-projet" class="minwidth300">
                                 <option></option>
                                 <?php foreach ($options_creafact_projet as $opt): if(!$opt['disabled']): ?>
                                     <option value="<?php echo $opt['key']; ?>" <?php if($opt['key'] == GETPOST('creafact-projet')): echo 'selected'; endif; ?>><?php echo $opt['label']; ?></option>

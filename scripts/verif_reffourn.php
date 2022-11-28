@@ -16,15 +16,18 @@
  * You should have received a copy of the GNU AGPL
  * along with this program.  If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
  */
+if (! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1'); // Disables token renewal
 
 $res=0;
 if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.php';
 if (! $res && file_exists("../../../main.inc.php")) $res=@include '../../../main.inc.php';
 
-$facture_reffourn = $_POST['facture_reffourn'];
+$facture_reffourn = $_GET['facture_reffourn'];
+$facture_fournid = $_GET['facture_fournid'];
 
-$sql_checkref = "SELECT rowid FROM ".MAIN_DB_PREFIX."facture_fourn WHERE ref_supplier = '$facture_reffourn'";
+$sql_checkref = "SELECT rowid FROM ".MAIN_DB_PREFIX."facture_fourn WHERE ref_supplier = '$facture_reffourn' AND fk_soc = '$facture_fournid'";
 $result_checkref = $db->query($sql_checkref);
 $count_checkref = $db->num_rows($result_checkref);
 
-if($count_checkref > 0): echo 'exist'; endif;
+//if($count_checkref > 0): echo 'exist'; endif;
+if($count_checkref > 0): echo '1'; else: echo '0'; endif;

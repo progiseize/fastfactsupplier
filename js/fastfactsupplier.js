@@ -19,27 +19,16 @@
 jQuery(document).ready(function() {
 
 
-const a = window.location.pathname;
-const b = a.split('/');
-const is_ffs = a.includes('fastfactsupplier');
+/*********************/
+/***** LANGUAGES *****/
 
-
-// TRADUCTIONS DISPONIBLES
-var traductionList = [
-    'fr_FR',
-    'en_US',
-]
-
-// RECUPERATION DE LA TRADUCTION
+var traductionList = ['fr_FR','en_US']
 let traductionTxt = new Object();
 var dirLang = jQuery('#fastfact-lang').val();
 var dirLangFinal;
 
-
 if(traductionList.includes(dirLang)){ dirLangFinal = dirLang;}
 else {dirLangFinal = 'en_US';}
-
-
 
 jQuery.ajax('./langs/'+dirLangFinal+'/fastfactsupplier.lang',{
     async: false,
@@ -51,34 +40,98 @@ jQuery.ajax('./langs/'+dirLangFinal+'/fastfactsupplier.lang',{
     }
 });
 
-/*jQuery.get('./langs/'+dirLang+'/fastfactsupplier.lang')
-    .done(function(data){ 
-        
-        
 
-    }).fail(function() {
-
-        console.log('existe pas');
-
-        jQuery.ajax('./langs/en_US/fastfactsupplier.lang',{
-             async: false,
-             success:function(response){
-                var lines = response.split(/\r\n|\n/);
-                lines.forEach(function(elem){
-                    if(elem.startsWith('ffs_')){ var result = elem.split('=');  traductionTxt[result[0].trim()] = result[1].trim();}
-                });
-             }
-        });
-});
-*/
-
-
-
-//console.log(traductionTxt['ffs_save']);
-
-
-// MISE EN FORME CALENDRIER
+/*********************/
+/***** CALENDAR *****/
 jQuery( ".datepick" ).datepicker();
+
+
+/*********************/
+/***** SUPPLIER SELECT *****/
+nom_addclass = jQuery('#creatiers-nom').data('addclass');
+jQuery('#creatiers-nom').select2({
+    placeholder: traductionTxt['ffs_infosgen_typeorselectinlist'],
+    tags: true,
+    containerCssClass: nom_addclass
+});
+
+jQuery('#creatiers-nom').on('select2:select', function (e) {
+  
+    var data = e.params.data;
+    if (typeof data.element !== 'undefined') {
+        var dataset = data.element.dataset;        
+        jQuery('input[name="is-already"]').attr('value','1');
+        jQuery('input[name="fournid"]').attr('value',dataset.fournid);
+        jQuery('#creatiers-codefournisseur').val(dataset.codefourn);
+    }
+    else {
+        var new_reffourn = jQuery('#new_reffourn').val();
+        jQuery('#creatiers-codefournisseur').val(new_reffourn);
+        jQuery('input[name="is-already"]').attr('value','0');
+        jQuery('input[name="fournid"]').attr('value','');
+    }
+    
+    var numfacturl = jQuery(this).data('numfacturl');
+
+    jQuery.ajax({
+        url:numfacturl,
+        async: true,
+        method:'GET',
+        data:{tiers:data.id},
+        success:function(response){
+            jQuery('.txt-numfact').html('('+response+')');
+
+            var test_reffourn = jQuery('#creafact-reffourn').val();
+            if (test_reffourn !== "") {
+                checkSupplierRef(jQuery('#creafact-reffourn').data('checkrefurl'),test_reffourn,data.id);
+            }
+        }
+    });
+    
+});
+
+
+/*********************/
+/***** SUPPLIER REF *****/
+jQuery('#creafact-reffourn').on('change',function(e){
+
+    e.preventDefault();
+    var checkrefurl = jQuery(this).data('checkrefurl');
+    var reffourn = jQuery(this).val();
+    var fournid = jQuery('#creatiers-nom').val();
+
+    checkSupplierRef(checkrefurl,reffourn,fournid);
+
+});
+
+function checkSupplierRef(checkrefurl,reffourn,fournid){
+   if (fournid !== "") {
+
+        jQuery.ajax({
+            url:checkrefurl,
+            async: true,
+            method:'GET',
+            data:{facture_reffourn:reffourn,facture_fournid:fournid},
+            success:function(response){
+
+                console.log(response);
+
+                if(parseInt(response) > 0){
+                    alert(traductionTxt['ffs_fielderror_reffourn_exist']);
+                    jQuery('#creafact-reffourn').addClass('ffs-fielderror');
+                } else {
+                    jQuery('#creafact-reffourn').removeClass('ffs-fielderror');
+                }
+            }
+        });
+    }
+}
+
+
+
+
+
+
 
 // SUPPRESSION D'UNE LIGNE DE FACTURE
 jQuery('#del-facture-line').on('click',function(e){
@@ -103,21 +156,27 @@ jQuery('#add-facture-line').on('click',function(e){
     var viewNumber = numViews + 1;
     jQuery('input[name="infofact-linenumber"]').attr('value',viewNumber);
 
-    jQuery.post(addurl,{viewnumber : viewNumber},function(view){
-        jQuery('#fastfact-tablelines tbody').append(view);
-        if(viewNumber > 1){jQuery('#del-facture-line').show();}
+    jQuery.ajax({
+        url:addurl,
+        async: true,
+        method:'GET',
+        data:{viewnumber:viewNumber},
+        success:function(view){
+            jQuery('#fastfact-tablelines tbody').append(view);
+            if(viewNumber > 1){jQuery('#del-facture-line').show();}
 
-        jQuery('.pdx.pdx-'+ viewNumber).select2({placeholder: traductionTxt['ffs_infosgen_selectinlist'],language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
-        jQuery('.linefact select.pdx, .linefact select.calc-tva').each(function(e){
-            class_pdx = jQuery(this).data('addclass');
-            jQuery(this).select2({placeholder: traductionTxt['ffs_infosgen_selectinlist'],containerCssClass: class_pdx,language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
-        });
-        jQuery('.linefact select.pj-select').each(function(e){
-            jQuery(this).select2({placeholder:{id: '0', text: traductionTxt['ffs_infosgen_selectinlist']},language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
-        });
-        jQuery('.ffs-slct').each(function(e){
-            jQuery(this).select2({containerCssClass: ':all:',language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
-        });
+            jQuery('.pdx.pdx-'+ viewNumber).select2({placeholder: traductionTxt['ffs_infosgen_selectinlist'],language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
+            jQuery('.linefact select.pdx, .linefact select.calc-tva').each(function(e){
+                class_pdx = jQuery(this).data('addclass');
+                jQuery(this).select2({placeholder: traductionTxt['ffs_infosgen_selectinlist'],containerCssClass: class_pdx,language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
+            });
+            jQuery('.linefact select.pj-select').each(function(e){
+                jQuery(this).select2({placeholder:{id: '0', text: traductionTxt['ffs_infosgen_selectinlist']},language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
+            });
+            jQuery('.ffs-slct').each(function(e){
+                jQuery(this).select2({containerCssClass: ':all:',language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
+            });
+        }
     });
 
 });
@@ -127,11 +186,6 @@ jQuery('.pdx').each(function(e){
     class_pdx = jQuery(this).data('addclass');
     jQuery(this).select2({placeholder: traductionTxt['ffs_infosgen_selectinlist'],containerCssClass: class_pdx,language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
 });
-
-// SELECT2 SUR LIGNE - PROJETS
-/*jQuery('.pj-select').each(function(e){    
-    jQuery(this).select2({placeholder:{id: '0', text: traductionTxt['ffs_infosgen_selectinlist']},language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
-});*/
 
 // SELECT2
 jQuery('#cats-ids').select2({
@@ -152,38 +206,8 @@ jQuery('.ffs-slct').each(function(e){
     jQuery(this).select2({containerCssClass: ':all:',language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
 });
 
-// SELECT2 - TIERS
-nom_addclass = jQuery('#creatiers-nom').data('addclass');
-jQuery('#creatiers-nom').select2({
-    placeholder: traductionTxt['ffs_infosgen_typeorselectinlist'],
-    tags: true,
-    containerCssClass: nom_addclass
-});
 
-// A LA SELECTION DU TIERS
-jQuery('#creatiers-nom').on('select2:select', function (e) {
-  
-    var data = e.params.data;
-    if (typeof data.element !== 'undefined') {
-        var dataset = data.element.dataset;        
-        jQuery('input[name="is-already"]').attr('value','1');
-        jQuery('input[name="fournid"]').attr('value',dataset.fournid);
-        jQuery('#creatiers-codefournisseur').val(dataset.codefourn);
-    }
-    else {
-        var new_reffourn = jQuery('#new_reffourn').val();
-        jQuery('#creatiers-codefournisseur').val(new_reffourn);
-        jQuery('input[name="is-already"]').attr('value','0');
-        jQuery('input[name="fournid"]').attr('value','');
-    }
-    
-    var numfacturl = jQuery(this).data('numfacturl');
 
-    jQuery.post(numfacturl,{tiers : data.id},function(xy){ console.log(xy);
-        jQuery('.txt-numfact').html('('+xy+')');
-    });
-    
-});
 
 //
 
@@ -283,32 +307,14 @@ jQuery('#fastfact-tablelines').on('change','.calc-tva',function(e){
 });
 
 
-jQuery('#creafact-reffourn').on('change',function(e){
-
-    e.preventDefault();
-    var checkrefurl = jQuery(this).data('checkrefurl');
-    var reffourn = jQuery(this).val();
-    jQuery.post(checkrefurl,{facture_reffourn : reffourn},function(reponse){
-
-        if(reponse == 'exist'){
-            alert(traductionTxt['ffs_fielderror_reffourn_exist']);
-            jQuery('#creafact-reffourn').addClass('ffs-fielderror');
-        } else {
-            jQuery('#creafact-reffourn').removeClass('ffs-fielderror');
-        }
-    });
-
-});
 
 var toggle = 0;
 jQuery('#toggle_untoggle').on('click',function(e){
 
     e.preventDefault();
 
-    if(toggle == 0){
-        jQuery('input.toguntog').prop('checked',true); toggle = 1;
-    } else {
-        jQuery('input.toguntog').prop('checked',false); toggle = 0;
+    if(toggle == 0){ jQuery('input.toguntog').prop('checked',true); toggle = 1;
+    } else { jQuery('input.toguntog').prop('checked',false); toggle = 0;
     }
 })
 
