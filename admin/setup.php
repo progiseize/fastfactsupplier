@@ -79,7 +79,7 @@ endif;
 /*******************************************************************
 * ACTIONS
 ********************************************************************/
-if ($action == 'setOptions'):
+if ($action == 'setOptions' && GETPOST('token') == $_SESSION['token']):
 
     $cats = json_encode(GETPOST('srff-cats'));
     $useServer = GETPOST('srff-useserver');
@@ -187,6 +187,7 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfac
     <form enctype="multipart/form-data" action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="POST" id="">
 
         <input type="hidden" name="action" value="setOptions">
+        <input type="hidden" name="token" value="<?php echo newtoken(); ?>">
 
         <table class="noborder centpercent pgsz-option-table" style="border-top:none;">
             <tbody>
