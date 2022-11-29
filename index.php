@@ -120,8 +120,10 @@ $action = GETPOST('action');
 // ON RECUPERE LES LABELS DES EXTRAFIELDS $FACTURE (FOURNISSEUR)
 if($show_extrafields_facture): $extralabels_facture = $extrafields->fetch_name_optionals_label($facture->table_element); endif;
 if($show_extrafields_factureline): $extralabels_factureligne = $extrafields->fetch_name_optionals_label($facture_ligne->table_element); endif; // LIGNES FACTURE
-$nb_exttrafields = $extrafields->attribute_elementtype?array_count_values($extrafields->attribute_elementtype):0;
 $extraf_visibletab = array('1','3'); 
+
+//var_dump($extralabels_facture);
+//var_dump($extralabels_factureligne);
 
 /*******************************************************************
 * ACTIONS
@@ -328,20 +330,27 @@ if ($action == 'create' && $token == $_SESSION['token']):
 
     if(!$error):
 
+        var_dump($_POST);
+
         // ON VERIFIE SI LE TIERS A BESOIN D'ETRE CRÉÉ
         $is_already = GETPOST('is-already');
-        $check_tiers_name = $societe->fetch('',GETPOST('creatiers-nom', 'alpha'));
+
+        if(empty(GETPOST('fournid'))):
+            $check_tiers = $societe->fetch('',GETPOST('creatiers-nom', 'alpha'));
+        else:
+            $check_tiers = $societe->fetch(GETPOST('fournid', 'int'));
+        endif;
 
         /**********************************************************/
         /* TIERS*/
         /**********************************************************/
         // SI LE TIERS EXISTE
-        if($check_tiers_name > 0):
+        if($check_tiers > 0):
             $tiers_rowid = GETPOST('fournid', 'int');
             $societe->fetch($societe->id);
 
         // SI LE TIERS N'EXISTE PAS
-        elseif($check_tiers_name == 0):
+        elseif($check_tiers == 0):
             $societe->nom = GETPOST('creatiers-nom', 'alpha');
             $societe->fournisseur = 1;
             $societe->get_codefournisseur($societe,1);
@@ -536,6 +545,7 @@ $date_facturation = GETPOST("creafact-datefact"); if(empty($date_facturation)): 
 $date_limit = GETPOST("creafact-datelim"); if(empty($date_limit)): $date_limit = $today; endif;
 
 
+
 /***************************************************
 * VIEW
 ****************************************************/
@@ -624,7 +634,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                 <tr class="oddeven pgsz-optiontable-tr">
                     <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_infosgen_facture_bankaccount'); ?></td>
                     <td class="right pgsz-optiontable-field">
-                        <?php $form->select_comptes(GETPOSTISSET('srff-bank-account') ? GETPOST('srff-bank-account') : $conf->global->SRFF_BANKACCOUNT,'srff-bank-account',0,'',1); ?>
+                        <?php $form->select_comptes(GETPOSTISSET('srff-bank-account') ? GETPOST('srff-bank-account') : $conf->global->SRFF_BANKACCOUNT,'srff-bank-account',0,'',1,'',0,'minwidth300'); ?>
                     </td>
                 </tr>
                 <?php endif; ?>
@@ -653,14 +663,12 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                 </tr>
                 <?php endif; ?>
 
-                <?php // EXTRAFIELDS FACTURE
-                        
+                <?php // EXTRAFIELDS FACTURE                        
                 if($show_extrafields_facture): 
 
-                    // ON RECUPERE LES CHAMPS VISIBLES
                     $visible_extrafacture = array();
                     foreach($extralabels_facture as $key_exf => $exf):
-                        if(in_array($extrafields->attribute_list[$key_exf], $extraf_visibletab)):
+                        if(in_array($extrafields->attributes['facture_fourn']['list'][$key_exf], $extraf_visibletab) && $extrafields->attributes['facture_fourn']['enabled'][$key_exf]):
                             $visible_extrafacture[$key_exf] = $extralabels_facture[$key_exf];
                         endif;
                     endforeach;
@@ -678,11 +686,11 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                         // POUR CHAQUE CHAMP VISIBLE
                         foreach($visible_extrafacture as $key_exf => $exf):
 
-                            $exf_type = $extrafields->attribute_type[$key_exf];
-                            $exf_label = $extrafields->attribute_label[$key_exf];
-                            $exf_required = $extrafields->attribute_required[$key_exf];
+                            $exf_type = $extrafields->attributes['facture_fourn']['type'][$key_exf];
+                            $exf_label = $extrafields->attributes['facture_fourn']['label'][$key_exf];
+                            $exf_required = $extrafields->attributes['facture_fourn']['required'][$key_exf];
 
-                            $value_extrafield = $_POST['options_'.$key_exf]; if (is_array($value_extrafield)): $value_extrafield = implode(',', $value_extrafield); endif;
+                            $value_extrafield = GETPOST('options_'.$key_exf); if (is_array($value_extrafield)): $value_extrafield = implode(',', $value_extrafield); endif;
                             $class_extrafield = ''; if(in_array('options_'.$key_exf, $input_errors)):  $class_extrafield .= ' ffs-fielderror'; endif;
 
                             ?>
@@ -700,7 +708,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                             else: ?>
                                 <td class="bold pgsz-optiontable-fieldname"><?php echo $exf_label; ?><?php if($exf_required == '1'): ?> <span class="required">*</span> <?php endif; ?></td>
                                 <td class="right pgsz-optiontable-field">
-                                    <?php echo $extrafields->showInputField($key_exf,$value_extrafield,'','','',$class_extrafield,$facture->id); ?>
+                                    <?php echo $extrafields->showInputField($key_exf,$value_extrafield,'','','',$class_extrafield,$facture->id,$facture->table_element); ?>
                                 </td>
                             <?php
                             endif; ?>
@@ -730,7 +738,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                     <?php if($show_extrafields_factureline): // ON RECUPERE LES CHAMPS VISIBLES
                         $visible_extrafacture_ligne = array();
                         foreach($extralabels_factureligne as $key_exfl => $exfl):
-                            if(in_array($extrafields->attribute_list[$key_exfl], $extraf_visibletab)):
+                            if(in_array($extrafields->attributes['facture_fourn_det']['list'][$key_exfl], $extraf_visibletab) && $extrafields->attributes['facture_fourn_det']['enabled'][$key_exfl]):
                                 $visible_extrafacture_ligne[$key_exfl] = $extralabels_factureligne[$key_exfl]; ?>
                                 <th class="left">
                                     <?php echo $extrafields->attribute_label[$key_exfl]; if($extrafields->attribute_required[$key_exfl] == 1): ?><span class="required">*</span><?php endif; ?>
@@ -760,14 +768,14 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
 
                                 $value_extrafield = $_POST['options_'.$key_exfl.'-1']; if (is_array($value_extrafield)): $value_extrafield = implode(',', $value_extrafield); endif;
                                 
-                                $class_extrafield = '';
+                                $class_extrafield = 'minwidth200';
                                 if(in_array('options_'.$key_exfl.'-1', $input_errors)): $class_extrafield .= ' ffs-fielderror'; endif;
                                 if($key_exfl == $conf->global->SRFF_EXTRAFACTLINE_PROJECT): $class_extrafield .= ' ffs-lineproject'; endif;
                                 if(in_array($exfl_type, array('select','sellist'))): $class_extrafield .= ' ffs-slct'; endif;
                                
                                 ?>
                                 <td class="left pgsz-optiontable-field">
-                                    <?php echo $extrafields->showInputField($key_exfl,$value_extrafield,'style="width:95%;"','-1','',trim($class_extrafield),$facture->id); ?>
+                                    <?php echo $extrafields->showInputField($key_exfl,$value_extrafield,'','-1','',trim($class_extrafield),$facture->id,$facture->table_element_line); ?>
                                 </td>
 
                             <?php endforeach; ?>

@@ -83,7 +83,7 @@ jQuery('#creatiers-nom').on('select2:select', function (e) {
 
             var test_reffourn = jQuery('#creafact-reffourn').val();
             if (test_reffourn !== "") {
-                checkSupplierRef(jQuery('#creafact-reffourn').data('checkrefurl'),test_reffourn,data.id);
+                checkSupplierRef(jQuery('#creafact-reffourn').data('checkrefurl'),test_reffourn,dataset.fournid);
             }
         }
     });
@@ -98,8 +98,7 @@ jQuery('#creafact-reffourn').on('change',function(e){
     e.preventDefault();
     var checkrefurl = jQuery(this).data('checkrefurl');
     var reffourn = jQuery(this).val();
-    var fournid = jQuery('#creatiers-nom').val();
-
+    var fournid = jQuery('#fournid').val();
     checkSupplierRef(checkrefurl,reffourn,fournid);
 
 });

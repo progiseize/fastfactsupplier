@@ -77,31 +77,27 @@ $input_errors = array();
 $version = explode('.', DOL_VERSION);
 if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
 
-if($show_extrafields_factureline): $extrafields->fetch_name_optionals_label('facture_fourn_det'); endif; // LIGNES FACTURE
-$nb_exttrafields = $extrafields->attribute_elementtype?array_count_values($extrafields->attribute_elementtype):0;
-
-$array_not_show = array(-1,0,2);
-
+if($show_extrafields_factureline): $extralabels_factureligne = $extrafields->fetch_name_optionals_label('facture_fourn_det'); endif; // LIGNES FACTURE
+$extraf_visibletab = array('1','3'); 
 /***************************************************************************/
 
-include_once('../lib/functions.lib.php');
-
-?>
+include_once('../lib/functions.lib.php'); ?>
 
 <tr id="linefact-<?php echo GETPOST('viewnumber') ?>" class="oddeven pgsz-optiontable-tr linefact">
     <td class="pgsz-optiontable-field">
         <input type="hidden" name="infofact-saisie-<?php echo GETPOST('viewnumber'); ?>" id="infofact-saisie-<?php echo GETPOST('viewnumber'); ?>" value="" >
         <?php echo ffs_select_prodserv($tab_prodserv,GETPOST('viewnumber'),'',$input_errors); ?>
     </td>
-    <?php if($show_extrafields_factureline && $nb_exttrafields['facture_fourn_det'] > 0): ?>
-        <?php foreach($extrafields->attribute_label as $key => $label): if($extrafields->attribute_elementtype[$key] == 'facture_fourn_det' && !in_array($extrafields->attribute_list[$key], $array_not_show) ): ?>
+    <?php if($show_extrafields_factureline && !empty($extralabels_factureligne)):  ?>
+        <?php foreach($extralabels_factureligne as $key => $label): 
+            if(in_array($extrafields->attributes['facture_fourn_det']['list'][$key], $extraf_visibletab) && $extrafields->attributes['facture_fourn_det']['enabled'][$key]): ?>
             <td class="left">
                 <?php 
-                    $class_field = 'ffs-cfligne';
+                    $class_field = 'ffs-cfligne minwidth200';
                     if($key == $conf->global->SRFF_EXTRAFACTLINE_PROJECT): $class_field .= ' ffs-lineproject'; endif;
                     if(in_array($extrafields->attribute_type[$key], array('select','sellist'))): $class_field .= ' ffs-slct'; endif;
                 ?>
-                <?php echo $extrafields->showInputField($key,$value_extrafield,'style="width:95%;"','-'.GETPOST('viewnumber'),'',$class_field,$facture->id); ?>
+                <?php echo $extrafields->showInputField($key,$value_extrafield,'','-'.GETPOST('viewnumber'),'',$class_field,$facture->id,'facture_fourn_det'); ?>
             </td>
         <?php endif; endforeach; ?>
     <?php endif; ?>

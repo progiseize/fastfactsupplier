@@ -195,7 +195,7 @@ function ffs_getListFourn($selected = '',$next_code_fournisseur){
     while($f = $db->fetch_object($fourns)):
         $options .= '<option ';
         if($selected == $f->nom): $options .= 'selected="selected" '; endif;
-        $options .= 'value="'.$f->rowid.'" data-fournid="'.$f->rowid.'" data-codefourn="'.$f->code_fournisseur.'" >'.$f->nom.'</option>';
+        $options .= 'value="'.$f->nom.'" data-fournid="'.$f->rowid.'" data-codefourn="'.$f->code_fournisseur.'" >'.$f->nom.'</option>';
         array_push($list_fourns, $f->nom);
     endwhile;
     if(!empty($selected) && !in_array($selected, $list_fourns)):
