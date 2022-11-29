@@ -58,6 +58,8 @@ if(!empty($extrafields->attribute_elementtype)):
     endforeach;
 endif;
 
+var_dump($extrafields->attributes);
+
 $sql_checkconst = "SELECT rowid FROM ".MAIN_DB_PREFIX."const";
 $sql_checkconst .= " WHERE name IN (";
 $sql_checkconst .= " 'MAIN_MODULE_FASTFACTSUPPLIER_JS','MAIN_MODULE_FASTFACTSUPPLIER_CSS','MAIN_MODULE_FASTFACTSUPPLIER_HOOKS'";
@@ -300,6 +302,9 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfac
                     <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_options_customfields_desc'); ?></td>
                     <td class="right pgsz-optiontable-field "><input type="checkbox" name="srff-showextrafactline" id="srff-showextrafactline" value="oui" <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
+
+                <?php var_dump($conf->global->SRFF_SHOWEXTRAFACTLINE,$extras_factureligne); ?>
+
                 <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE && !empty($extras_factureligne)): ?>
                 <tr class="oddeven pgsz-optiontable-tr">
                     <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->trans('ffs_options_params_linkprojectslines'); ?></td>               

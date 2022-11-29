@@ -1,6 +1,8 @@
 # FastFactSupplier
 
 [comment]: <> (TODO)
+[comment]: <> (Lang sur pages config)
+[comment]: <> (extrafields v15+)
 [comment]: <> (Extrafields : type unique ne fonctionnent pas)
 [comment]: <> (Extrafields : Prise en compte de la taille des champs)
 [comment]: <> (Verification des infos fournisseurs sur societeinfo ?)
