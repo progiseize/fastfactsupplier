@@ -45,3 +45,10 @@
 
 .ffs-fielderror {border-bottom: 1px solid red !important;}
 .select2-selection.select2-selection--single.ffs-fielderror {border-bottom: 1px solid red;}
+
+@media only screen and (min-width: 767px)
+{
+    .fastfactsupplier .select2-container.select2-container--open .select2-dropdown.ui-dialog {
+        min-width: auto !important;
+    }
+}

@@ -76,11 +76,13 @@ $ccs = array(
     '647500' => "Médecine du travail",
     //'CODECOMPTABLE' => "LIBELLE",
 );
-
 $nbCcs = count($ccs);
-$cats = new Categorie($db);
 $split_ccs = array_chunk($ccs, 20, true);
-$all_cats = $cats->get_all_categories();
+
+$cats = new Categorie($db);
+
+$form = new Form($db);
+$cate_arbo = $form->select_all_categories(Categorie::TYPE_PRODUCT, '', 'parent', 64, 0, 1);
 
 /*******************************************************************/
 // ACTIONS
@@ -206,7 +208,7 @@ endif;
 // VUE
 /*******************************************************************/
 
-llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css")); ?>
+llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css"),'','fastfactsupplier insert'); ?>
 
 <div id="pgsz-option" class="fastfact">
 
@@ -266,12 +268,7 @@ llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',array("/fastfactsupplier
                         <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_cc_create_cat'); ?></td>               
                         <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_cc_create_cat_desc'); ?></td>
                         <td class="right pgsz-optiontable-field ">
-                            <select class="flat minwidth300" name="cats-ids" id="cats-ids" >
-                                <option></option>
-                                <?php foreach ($all_cats as $acat): ?>
-                                    <option value="<?php echo $acat->id; ?>"><?php echo $acat->label; ?></option>
-                                <?php endforeach; ?>                                            
-                            </select>
+                            <?php echo $form->selectarray('cats-ids',$cate_arbo,GETPOST('cats-ids'),0,0,0,'',0,0,0,'','minwidth200'); ?>      
                         </td>
                     </tr>
                              

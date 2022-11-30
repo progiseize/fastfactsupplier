@@ -18,6 +18,10 @@
 
  */
 
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 $res=0;
 if (! $res && file_exists("../main.inc.php")): $res=@include '../main.inc.php'; endif;
 if (! $res && file_exists("../../main.inc.php")): $res=@include '../../main.inc.php'; endif;
@@ -82,8 +86,11 @@ if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
 // On calcule le prochain code fournisseur
 $societe->get_codefournisseur($societe,1);
 
-// On recupere les taux de TVA
-$tab_tva = ffs_getTxTva($mysoc->country_id);
+$form->load_cache_vatrates("'".$mysoc->country_code."'");
+$vat_rates = array();
+foreach($form->cache_vatrates as $vat):
+    $vat_rates[$vat['txtva']] = $vat['label'];
+endforeach;
 
 // On recupère la liste des services
 if($use_server_list): $tab_prodserv = ffs_getListProdServ($cats_to_use);
@@ -335,10 +342,8 @@ if ($action == 'create' && $token == $_SESSION['token']):
         // ON VERIFIE SI LE TIERS A BESOIN D'ETRE CRÉÉ
         $is_already = GETPOST('is-already');
 
-        if(empty(GETPOST('fournid'))):
-            $check_tiers = $societe->fetch('',GETPOST('creatiers-nom', 'alpha'));
-        else:
-            $check_tiers = $societe->fetch(GETPOST('fournid', 'int'));
+        if(empty(GETPOST('fournid'))): $check_tiers = $societe->fetch('',GETPOST('creatiers-nom', 'alpha'));
+        else: $check_tiers = $societe->fetch(GETPOST('fournid', 'int'));
         endif;
 
         /**********************************************************/
@@ -360,8 +365,7 @@ if ($action == 'create' && $token == $_SESSION['token']):
             $update_societe = $societe->update($tiers_rowid,$user); if($update_societe < 0): $error++; endif;
             $societe->fetch($tiers_rowid);
         else:
-            $error++;
-            array_push($errmsg,$langs->transnoentities('ffs_fielderror_tierstoomuch'));
+            $error++; array_push($errmsg,$langs->transnoentities('ffs_fielderror_tierstoomuch'));
         endif;
 
         /**********************************************************/
@@ -544,13 +548,11 @@ $code_fournisseur = GETPOST("creatiers-codefournisseur"); if(empty($code_fournis
 $date_facturation = GETPOST("creafact-datefact"); if(empty($date_facturation)): $date_facturation = $today; endif;
 $date_limit = GETPOST("creafact-datelim"); if(empty($date_limit)): $date_limit = $today; endif;
 
-
-
 /***************************************************
 * VIEW
 ****************************************************/
 
-llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css")); ?>
+llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css"),'','fastfactsupplier saisie'); ?>
 
 <!-- CONTENEUR GENERAL -->
 <div id="pgsz-option" class="fastfact">
@@ -762,9 +764,9 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                         <?php if($show_extrafields_factureline && !empty($visible_extrafacture_ligne)): 
                             foreach($visible_extrafacture_ligne as $key_exfl => $exfl):
 
-                                $exfl_type = $extrafields->attribute_type[$key_exfl];
-                                $exfl_label = $extrafields->attribute_label[$key_exfl];
-                                $exfl_required = $extrafields->attribute_required[$key_exfl];
+                                $exfl_type = $extrafields->attributes['facture_fourn_det']['type'][$key_exfl];
+                                $exfl_label = $extrafields->attributes['facture_fourn_det']['label'][$key_exfl];
+                                $exfl_required = $extrafields->attributes['facture_fourn_det']['required'][$key_exfl];
 
                                 $value_extrafield = $_POST['options_'.$key_exfl.'-1']; if (is_array($value_extrafield)): $value_extrafield = implode(',', $value_extrafield); endif;
                                 
@@ -783,7 +785,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                         <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-1" id="infofact-montantht-1" class="calc-amount" value="" data-mode="ht" data-linenum="1"/></td>
                         <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-1" id="infofact-montantttc-1" class="calc-amount" value="" data-mode="ttc" data-linenum="1"/></td>
                         <td class="pgsz-optiontable-field right">
-                            <?php if(!empty($tab_tva)): echo ffs_select_tva($tab_tva,1);
+                            <?php if(!empty($vat_rates)): echo $form->selectarray('infofact-tva-1',$vat_rates,$conf->global->SRFF_DEFAULT_TVA,0,0,0,'data-linenum="1"',0,0,0,'','minwidth100 calc-tva');
                             else: echo $langs->transnoentities('ffs_noVAT');
                             endif; ?>                                
                         </td>                        
@@ -799,26 +801,27 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                         <?php if($show_extrafields_factureline && !empty($visible_extrafacture_ligne)): 
                             foreach($visible_extrafacture_ligne as $key_exfl => $exfl):
 
-                                $exfl_type = $extrafields->attribute_type[$key_exfl];
-                                $exfl_label = $extrafields->attribute_label[$key_exfl];
-                                $exfl_required = $extrafields->attribute_required[$key_exfl];
+                                $exfl_type = $extrafields->attributes['facture_fourn_det']['type'][$key_exfl];
+                                $exfl_label = $extrafields->attributes['facture_fourn_det']['label'][$key_exfl];
+                                $exfl_required = $extrafields->attributes['facture_fourn_det']['required'][$key_exfl];
 
                                 $value_extrafield = $_POST['options_'.$key_exfl.'-'.$i]; if (is_array($value_extrafield)): $value_extrafield = implode(',', $value_extrafield); endif;
                                 
-                                $class_extrafield = '';
+                                $class_extrafield = 'minwidth200';
                                 if(in_array('options_'.$key_exfl.'-'.$i, $input_errors)):  $class_extrafield .= ' ffs-fielderror'; endif;
                                 if($key_exfl == $conf->global->SRFF_EXTRAFACTLINE_PROJECT): $class_extrafield .= ' ffs-lineproject'; endif;
                                 if(in_array($exfl_type, array('select','sellist'))): $class_extrafield .= ' ffs-slct'; endif;
                                
                                 ?>
-                                <td class="left pgsz-optiontable-field"><?php echo $extrafields->showInputField($key_exfl,$value_extrafield,'style="width:95%;"','-'.$i,'',trim($class_extrafield),$facture->id); ?></td>
+                                <td class="left pgsz-optiontable-field"><?php echo $extrafields->showInputField($key_exfl,$value_extrafield,'','-'.$i,'',trim($class_extrafield),$facture->id,$facture->table_element_line); ?></td>
 
                             <?php endforeach; ?>
                         <?php endif; ?>
                         <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo $i; ?>" id="infofact-montantht-<?php echo $i; ?>" class="calc-amount <?php echo is_fielderror('infofact-montantht-'.$i,$input_errors); ?>" value="<?php echo $line['montant_ligne_ht']; ?>" data-mode="ht" data-linenum="<?php echo $i; ?>" /></td>
                         <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo $i; ?>" id="infofact-montantttc-<?php echo $i; ?>" class="calc-amount <?php echo is_fielderror('infofact-montantttc-'.$i,$input_errors); ?>" value="<?php echo $line['montant_ligne_ttc']; ?>" data-mode="ttc" data-linenum="<?php echo $i; ?>" /></td>    
                         <td class="right">
-                            <?php if(!empty($tab_tva)): echo ffs_select_tva($tab_tva,$i,$line['taux_tva']);
+                            <?php if(!empty($vat_rates)): 
+                                echo $form->selectarray('infofact-tva-'.$i,$vat_rates,$line['taux_tva'],0,0,0,'data-linenum="'.$i.'"',0,0,0,'','minwidth100 calc-tva');
                             else: echo $langs->transnoentities('ffs_noVAT');
                             endif; ?> 
 
