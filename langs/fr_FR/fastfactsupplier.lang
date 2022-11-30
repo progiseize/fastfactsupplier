@@ -1,171 +1,116 @@
-# <Saisie Rapide Facture Fournisseurs>
-# Copyright (C) 2022 ProgiSeize <contact@progiseize.fr>
-
-# This program and files/directory inner it is free software: you can 
-# redistribute it and/or modify it under the terms of the 
-# GNU Affero General Public License (AGPL) as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU AGPL for more details.
-# You should have received a copy of the GNU AGPL
-# along with this program.  If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
-
-# Dolibarr language file - fr_FR - saisierapidefacturesfournisseurs
-
-Module300303Name = Saisie Rapide Factures Fournisseurs
-
-############################################
-### GENERAL
-############################################
-ffs_ht = HT
-ffs_ttc = TTC
-ffs_save = Sauvegarder
-ffs_save_invoice = Enregistrer
-ffs_cancel = Annuler
-
-############################################
-### PAGE INDEX
-############################################
-ffs_tabtitle = Saisie rapide
-ffs_page_title = Saisie rapide de factures fournisseurs
-
-ffs_infosgen = Informations générales
-ffs_infosgen_tiers = Création du tiers
-ffs_infosgen_tiers_name = Nom du tiers
-
-ffs_infosgen_facture = Informations de facture
-ffs_infosgen_facture_libelle = Libellé de facture
-ffs_infosgen_facture_ref = Référence fournisseur
-ffs_infosgen_facture_date = Date de facturation <span class="label-min">(jj/mm/aaaa)</span>
-ffs_infosgen_facture_datelim = Date limite de règlement <span class="label-min">(jj/mm/aaaa)</span>
-ffs_infosgen_facture_bankaccount = Compte bancaire
-ffs_infosgen_actions = Actions
-ffs_infosgen_actions_redirect = Voulez vous saisir un règlement ?
-ffs_infosgen_actions_redirect_active = Redirection activée !
-ffs_infosgen_actions_setproject = Associez la facture à un projet
-ffs_infosgen_customfields = Champs personnalisés - Factures
-
-ffs_infosgen_typeorselectinlist = Saisir ou choisir dans la liste
-ffs_infosgen_selectinlist = Choisir dans la liste
-ffs_infosgen_selectinlistproject = Choisir un projet dans la liste
-ffs_infosgen_selectnoresults = Aucun résultat
-
-ffs_details = Détails de la facture
-ffs_details_prodserv = Produit / Service
-ffs_details_amountht = Montant HT
-ffs_details_amountttc = Montant TTC
-ffs_details_amountboth = .....
-ffs_details_amounttax = TVA
-ffs_details_addline = Ajouter une ligne
-ffs_details_delline = Supprimer dernière ligne
-
-ffs_tabletotal_ht = Total HT
-ffs_tabletotal_tax = Total TVA
-ffs_tabletotal_ttc = Total TTC
-
-ffs_docs = Lier des fichiers / documents
-ffs_docs_uploadfile = Uploader un fichier
-ffs_docs_dragndrop = <span class="bold">Glissez / Déposez</span> ou <span class="bold">cliquez pour sélectionner un fichier</span> <span style="text-transform: none;">(%s Mo max).</span>
-ffs_docs_link = Lier un document
-ffs_docs_linklib = Libellé
-
-ffs_field_tiersname = Nom du tiers
-ffs_field_codefourn = Code fournisseur
-ffs_field_reffourn = Référence fournisseur
-ffs_field_date = Date de facturation
-ffs_field_datelim = Date limite
-ffs_field_prodserv = Produit / Service
-ffs_field_amount = Montant
-ffs_noVAT = Aucun taux de tva défini
-
-ffs_fielderror_reffourn_exist = Référence fournisseur existante. Celle-ci doit être unique.
-ffs_fielderror_date_limsupdate = La date limite de règlement ne peut être antérieure à la date de facturation
-ffs_fielderror_noletter = Le champ '%s' ne doit pas comporter de lettres
-ffs_fielderror_needint = Le champ '%s' nécessite une valeur entière
-ffs_fielderror_needfloat = Le champ '%s' nécessite une valeur entière ou décimale
-ffs_fielderror_tierstoomuch = Il existe déjà plusieurs tiers à ce nom
-ffs_fielderror_saveline = Erreur lors de l'ajout de la ligne %s
-ffs_fielderror_validateinvoice = Erreur lors de la validation de la facture
-ffs_fielderror_linkfile = Erreur avec le document lié
-ffs_fielderror_notuploadfile = Le fichier n'a pas pu être uploadé.
-ffs_fielderror_filetoobig = Fichier trop lourd.
-ffs_fielderror_saveextras = Problème enregistrement extrafields
-ffs_fielderror_needhtorttc = Ligne %s: Vous devez saisir un montant HT ou TTC
-
-ffs_confirm_save_invoice = Facture %s créée
-
-
-############################################
-### PAGE OPTIONS
-############################################
-ffs_options_page_title = Configuration du module Saisie Rapide Facture Fournisseurs
-
-ffs_options_tools = Outils
-ffs_options_tools_insertlink = Accès à la page d'insertion de comptes comptables
-
-ffs_options_cats = Catégories
-ffs_options_cats_usedolicats = Utiliser une catégorie existante ? <span class="ffs-idealoption">( Idéal entreprises )</span>
-ffs_options_cats_usedolicats_desc = Vous pouvez utiliser une catégorie de produits/services existants dans Dolibarr
-ffs_options_cats_usedolicats_ids = Catégories à utiliser
-ffs_options_cats_usedolicats_ids_desc = Vous pouvez choisir plusieurs catégories. Celles-ci seront utilisées si le paramètre précédent est activé.
-ffs_options_cats_predefined = Liste personnalisée  <span class="ffs-idealoption">( Idéal associations )</span>
-ffs_options_cats_predefined_desc = Liste à utiliser si l'utilisation de la catégorie existante est désactivée. (option1,option2,...)
-
-ffs_options_params = Paramètres généraux
-ffs_options_params_amountmode = Saisie des montants
-ffs_options_params_amountmode_desc = Mode de saisie des montants sur la page de saisie rapide
-ffs_options_params_defaulttax = Taux de tva par défaut
-ffs_options_params_defaulttax_desc = Celui-ci sera défini par défaut sur chaque nouvelle ligne de facture.
-ffs_options_params_bankaccount = Compte bancaire par défaut
-ffs_options_params_bankaccount_desc = Ce compte peut être modifié sur la page de saisie
-ffs_options_params_gotoreg = Règlement rapide
-ffs_options_params_gotoreg_desc = Aller automatiquement à la page de saisie de règlement à la validation de votre facture
-ffs_options_params_use_extrauploadfile = Voulez vous ajouter un champ personnalisé "Fichier Joint" ?
-ffs_options_params_use_extrauploadfile_desc = Celui-ci sera automatiquement rempli si un fichier est joint ou lié à la facture.
-ffs_options_params_use_extrauploadfilename = Fichier joint
-ffs_options_params_linkprojectslines = LIGNES FACTURES FOURNISSEURS • Projets
-ffs_options_params_linkprojectslines_desc = En cas d'utilisation d'un champ personnalisé pour renseigner un projet par lignes de facture, renseignez le ici. En selectionnant un projet global, celui ci remplira automatiquement les lignes mais resteront modifiables.
-
-ffs_options_customfields = Champs personnalisés
-ffs_options_customfields_invoice = Voulez vous affichez les champs personnalisés "FACTURES FOURNISSEURS" ?
-ffs_options_customfields_invoiceline = Voulez vous affichez les champs personnalisés "LIGNES FACTURES FOURNISSEURS" ?
-ffs_options_customfields_desc = Voir la documentation pour plus d'informations.
-
-ffs_options_error_cats_needed = Si vous choisissez d'utiliser une catégorie, vous devez renseigner son identifiant
-ffs_options_process_ok = Configuration sauvegardée
-
-ffs_amountmode_both = HT & TTC
-
-ffs_docs_linkurl = Url du fichier à lier
-ffs_docs_linklabel = Label du fichier à lier
-
-
-############################################
-### PAGE INSERT
-############################################
-ffs_insertContactProgiseize = 
-ffs_cc_insert = Insertion Comptes Comptable
-ffs_codecomptable = Compte Comptable
-ffs_cc_create_services = Souhaitez vous créer les services associés ?
-ffs_cc_create_services_desc = Les comptes comptables seront automatiquement associés aux services créés
-ffs_cc_create_cat = Ajouter les services à une catégorie ?
-ffs_cc_create_cat_desc = Choisissez la catégorie dans laquelle créer les services. Vous pouvez la créer vous même en saisissant le texte et en cliquant dessus.
-
-ffs_cc_toggle_untoggle = Sélectionner / Déselectionner tout
-
-ffs_cc_title_list = Choisir les comptes comptables à insérer
-ffs_cc_title_options = Options création de services
-ffs_cc_button_insert = Insérer
-
-#
-ffs_doc_title = Documentation
-ffs_doc_cc_insert_desc = Cet outil vous permet de créer les comptes comptables et les services associés des frais généraux les plus communs et les assigner à une catégorie de produits / services. 
-ffs_doc_options_cats_desc = 2 modes différents:<ul><li>Utilisation d'une catégorie existante : Les produits / services existent dans Dolibarr. Vous devez choisir une ou plusieurs catégories à utiliser.</li><li>Liste personnalisée : Les produits / services n'existent pas. Vous pouvez éditer une liste de produits / services libre en séparant les noms par une virgule (Service A,Service B,...).</li></ul>
-
-ffs_doc_extra_uploadfile = Champ personnalisé "Fichier Joint"
-ffs_doc_extra_uploadfile_desc = Cette option créé un extrafield booléen (Oui/Non) qui sera rempli automatiquement si une pièce à été ajoutée à la facture (upload ou fichier lié).
-
-ffs_doc_options_customfields_desc = Uniquement les extrafields avec une visibilité 1 ou 3 seront affichés. Cette fonctionnalité ne prend pas en charge la vérification des champs uniques et leur utilisation peut provoquer l’impossibilté de créér des factures fournisseurs depuis le module.<br>(Des améliorations de prise en charge sont prévues dans les prochaines versions).
+ffs_tabletotal_tax=Total TVA
+ffs_tabletotal_ttc=Total TTC
+ffs_infosgen_customfields=Champs personnalisés - Factures
+ffs_infosgen_actions_redirect_active=Redirection activée !
+ffs_infosgen_facture_date=Date de facturation <span class="label-min">(jj/mm/aaaa)</span>
+ffs_infosgen_facture_datelim=Date limite de règlement <span class="label-min">(jj/mm/aaaa)</span>
+ffs_infosgen_facture_bankaccount=Compte bancaire
+ffs_infosgen_actions=Actions
+ffs_details_amountboth=.....
+ffs_details_amounttax=TVA
+ffs_details_addline=Ajouter une ligne
+ffs_details_delline=Supprimer dernière ligne
+ffs_tabletotal_ht=Total HT
+ffs_infosgen_typeorselectinlist=Saisir ou choisir dans la liste
+ffs_infosgen_selectinlist=Choisir dans la liste
+ffs_infosgen_selectinlistproject=Choisir un projet dans la liste
+ffs_infosgen_selectnoresults=Aucun résultat
+ffs_details=Détails de la facture
+ffs_details_prodserv=Produit / Service
+ffs_details_amountht=Montant HT
+ffs_details_amountttc=Montant TTC
+Module300303Name=Saisie Rapide Factures Fournisseurs
+ffs_ht=HT
+ffs_ttc=TTC
+ffs_save=Sauvegarder
+ffs_save_invoice=Enregistrer
+ffs_cancel=Annuler
+ffs_tabtitle=Saisie rapide
+ffs_page_title=Saisie rapide de factures fournisseurs
+ffs_infosgen_actions_setproject=Associez la facture à un projet
+ffs_infosgen_actions_redirect=Voulez vous saisir un règlement ?
+ffs_infosgen=Informations générales
+ffs_infosgen_tiers=Création du tiers
+ffs_infosgen_tiers_name=Nom du tiers
+ffs_infosgen_facture=Informations de facture
+ffs_infosgen_facture_libelle=Libellé de facture
+ffs_infosgen_facture_ref=Référence fournisseur
+ffs_docs=Lier des fichiers / documents
+ffs_docs_uploadfile=Uploader un fichier
+ffs_docs_dragndrop=<span class="bold">Glissez / Déposez</span> ou <span class="bold">cliquez pour sélectionner un fichier</span> <span style="text-transform: none;">(%s Mo max).</span>
+ffs_docs_link=Lier un document
+ffs_docs_linklib=Libellé
+ffs_field_tiersname=Nom du tiers
+ffs_field_codefourn=Code fournisseur
+ffs_field_reffourn=Référence fournisseur
+ffs_field_date=Date de facturation
+ffs_field_datelim=Date limite
+ffs_field_prodserv=Produit / Service
+ffs_field_amount=Montant
+ffs_noVAT=Aucun taux de tva défini
+ffs_fielderror_reffourn_exist=Référence fournisseur existante. Celle-ci doit être unique.
+ffs_fielderror_date_limsupdate=La date limite de règlement ne peut être antérieure à la date de facturation
+ffs_fielderror_noletter=Le champ '%s' ne doit pas comporter de lettres
+ffs_fielderror_needint=Le champ '%s' nécessite une valeur entière
+ffs_fielderror_needfloat=Le champ '%s' nécessite une valeur entière ou décimale
+ffs_fielderror_tierstoomuch=Il existe déjà plusieurs tiers à ce nom
+ffs_fielderror_saveline=Erreur lors de l'ajout de la ligne %s
+ffs_fielderror_validateinvoice=Erreur lors de la validation de la facture
+ffs_fielderror_linkfile=Erreur avec le document lié
+ffs_fielderror_notuploadfile=Le fichier n'a pas pu être uploadé.
+ffs_fielderror_filetoobig=Fichier trop lourd.
+ffs_fielderror_saveextras=Problème enregistrement extrafields
+ffs_fielderror_needhtorttc=Ligne %s: Vous devez saisir un montant HT ou TTC
+ffs_confirm_save_invoice=Facture %s créée
+ffs_options_page_title=Configuration du module Saisie Rapide Facture Fournisseurs
+ffs_options_tools=Outils
+ffs_options_tools_insertlink=Accès à la page d'insertion de comptes comptables
+ffs_options_cats=Catégories
+ffs_options_cats_usedolicats=Utiliser une catégorie existante ? <span class="ffs-idealoption">( Idéal entreprises )</span>
+ffs_options_cats_usedolicats_desc=Vous pouvez utiliser une catégorie de produits/services existants dans Dolibarr
+ffs_options_cats_usedolicats_ids=Catégories à utiliser
+ffs_options_cats_usedolicats_ids_desc=Vous pouvez choisir plusieurs catégories. Celles-ci seront utilisées si le paramètre précédent est activé.
+ffs_options_cats_predefined=Liste personnalisée  <span class="ffs-idealoption">( Idéal associations )</span>
+ffs_options_cats_predefined_desc=Liste à utiliser si l'utilisation de la catégorie existante est désactivée. (option1,option2,...)
+ffs_options_params=Paramètres généraux
+ffs_options_params_amountmode=Saisie des montants
+ffs_options_params_amountmode_desc=Mode de saisie des montants sur la page de saisie rapide
+ffs_options_params_defaulttax=Taux de tva par défaut
+ffs_options_params_defaulttax_desc=Celui-ci sera défini par défaut sur chaque nouvelle ligne de facture.
+ffs_options_params_bankaccount=Compte bancaire par défaut
+ffs_options_params_bankaccount_desc=Ce compte peut être modifié sur la page de saisie
+ffs_options_params_gotoreg=Règlement rapide
+ffs_options_params_gotoreg_desc=Aller automatiquement à la page de saisie de règlement à la validation de votre facture
+ffs_options_params_use_extrauploadfile=Voulez vous ajouter un champ personnalisé "Fichier Joint" ?
+ffs_options_params_use_extrauploadfile_desc=Celui-ci sera automatiquement rempli si un fichier est joint ou lié à la facture.
+ffs_options_params_use_extrauploadfilename=Fichier joint
+ffs_options_params_linkprojectslines=LIGNES FACTURES FOURNISSEURS • Projets
+ffs_options_params_linkprojectslines_desc=En cas d'utilisation d'un champ personnalisé pour renseigner un projet par lignes de facture, renseignez le ici. 
+Celui ci doit être de type "Liste issue d'une table" avec comme valeur: projet:title:rowid (Vous pouvez ajouter des filtres au besoin)
+En sélectionnant un projet global, celui ci remplira automatiquement les lignes mais resteront modifiables. 
+ffs_options_customfields=Champs personnalisés
+ffs_options_customfields_invoice=Voulez vous affichez les champs personnalisés "FACTURES FOURNISSEURS" ?
+ffs_options_customfields_invoiceline=Voulez vous affichez les champs personnalisés "LIGNES FACTURES FOURNISSEURS" ?
+ffs_options_customfields_desc=Voir la documentation pour plus d'informations.
+ffs_options_error_cats_needed=Si vous choisissez d'utiliser une catégorie, vous devez renseigner son identifiant
+ffs_options_process_ok=Configuration sauvegardée
+ffs_amountmode_both=HT & TTC
+ffs_docs_linkurl=Url du fichier à lier
+ffs_docs_linklabel=Label du fichier à lier
+ffs_insertContactProgiseize=
+ffs_cc_insert=Insertion Comptes Comptable
+ffs_codecomptable=Compte Comptable
+ffs_cc_create_services=Souhaitez vous créer les services associés ?
+ffs_cc_create_services_desc=Les comptes comptables seront automatiquement associés aux services créés
+ffs_cc_create_cat=Ajouter les services à une catégorie ?
+ffs_cc_create_cat_desc=Choisissez la catégorie dans laquelle créer les services. Vous pouvez la créer vous même en saisissant le texte et en cliquant dessus.
+ffs_cc_toggle_untoggle=Sélectionner / Déselectionner tout
+ffs_cc_title_list=Choisir les comptes comptables à insérer
+ffs_cc_title_options=Options création de services
+ffs_cc_button_insert=Insérer
+ffs_doc_title=Documentation
+ffs_doc_cc_insert_desc=Cet outil vous permet de créer les comptes comptables et les services associés des frais généraux les plus communs et les assigner à une catégorie de produits / services.
+ffs_doc_options_cats_desc=2 modes différents:<ul><li>Utilisation d'une catégorie existante : Les produits / services existent dans Dolibarr. Vous devez choisir une ou plusieurs catégories à utiliser.</li><li>Liste personnalisée : Les produits / services n'existent pas. Vous pouvez éditer une liste de produits / services libre en séparant les noms par une virgule (Service A,Service B,...).</li></ul>
+ffs_doc_extra_uploadfile=Champ personnalisé "Fichier Joint"
+ffs_doc_extra_uploadfile_desc=Cette option créé un extrafield booléen (Oui/Non) qui sera rempli automatiquement si une pièce à été ajoutée à la facture (upload ou fichier lié).
+ffs_doc_options_customfields_desc=Uniquement les extrafields avec une visibilité 1 ou 3 seront affichés. Cette fonctionnalité ne prend pas en charge la vérification des champs uniques et leur utilisation peut provoquer l’impossibilté de créér des factures fournisseurs depuis le module.<br>(Des améliorations de prise en charge sont prévues dans les prochaines versions).
