@@ -23,6 +23,7 @@ if (! $res && file_exists("../../main.inc.php")): $res=@include '../../main.inc.
 if (! $res && file_exists("../../../main.inc.php")): $res=@include '../../../main.inc.php'; endif;
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 dol_include_once('./fastfactsupplier/lib/functions.lib.php');
@@ -48,17 +49,8 @@ if(!$user->rights->fastfactsupplier->configurer): accessforbidden(); endif;
 $action = GETPOST('action');
 $plugin_url = DOL_MAIN_URL_ROOT.'/custom/fastfactsupplier/'; 
 
-$extrafields->fetch_name_optionals_label('facture_fourn_det');
+$extralabels_factureligne = $extrafields->fetch_name_optionals_label('facture_fourn_det');
 
-//
-$extras_factureligne = array();
-if(!empty($extrafields->attribute_elementtype)):
-    foreach($extrafields->attribute_elementtype as $key => $type):
-        if($type == 'facture_fourn_det' && $extrafields->attribute_list[$key]): array_push($extras_factureligne, $key); endif;
-    endforeach;
-endif;
-
-var_dump($extrafields->attributes);
 
 $sql_checkconst = "SELECT rowid FROM ".MAIN_DB_PREFIX."const";
 $sql_checkconst .= " WHERE name IN (";
@@ -94,8 +86,7 @@ if ($action == 'setOptions' && GETPOST('token') == $_SESSION['token']):
     $showExtraFields_fact = GETPOST('srff-showextrafact');
     $showExtraFields_factline = GETPOST('srff-showextrafactline');
 
-    $cf_labels = $extrafields->fetch_name_optionals_label('facture_fourn');
-        
+    $cf_labels = $extrafields->fetch_name_optionals_label('facture_fourn');        
 
     $errs = 0;
 
@@ -162,20 +153,26 @@ if ($action == 'setOptions' && GETPOST('token') == $_SESSION['token']):
 endif;
 
 
-$form=new Form($db);
+$form = new Form($db);
+
+// ON RECUPERE LES CATEGORIES PRODUITS
 $cate_arbo = $form->select_all_categories(Categorie::TYPE_PRODUCT, '', 'parent', 64, 0, 1);
 $cats = json_decode($conf->global->SRFF_CATS);
 $arrayselected=array();
 if(!empty($cats)): foreach($cats as $cat): $arrayselected[] = $cat; endforeach; endif;
 
-
-
+// ON RECUPERE LES TAUX DE TVA
+$form->load_cache_vatrates("'".$mysoc->country_code."'");
+$vat_rates = array();
+foreach($form->cache_vatrates as $vat):
+    $vat_rates[$vat['txtva']] = $vat['label'];
+endforeach;
 
 
 /***************************************************
 * VIEW
 ****************************************************/
-llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css")); ?>
+llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css"),'','fastfactsupplier'); ?>
 
 <div id="pgsz-option" class="fastfact">
 
@@ -236,33 +233,15 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfac
                     <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_options_params_amountmode'); ?></td>               
                     <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_options_params_amountmode_desc'); ?></td>
                     <td class="right pgsz-optiontable-field ">
-                        <select id="srff-amount-mode" name="srff-amount-mode" class="opt-slct">
-                            <option value="ht" <?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'selected'; endif; ?>><?php print $langs->trans('ffs_ht'); ?></option>
-                            <option value="ttc" <?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'selected'; endif; ?>><?php print $langs->trans('ffs_ttc'); ?></option>
-                            <option value="both" <?php if($conf->global->SRFF_AMOUNT_MODE == 'both'): echo 'selected'; endif; ?>><?php print $langs->trans('ffs_amountmode_both'); ?></option>
-                        </select>
+                        <?php echo $form->selectarray('srff-amount-mode',array('ht' => 'HT','ttc' => 'TTC','both'=>'HT & TTC'),$conf->global->SRFF_AMOUNT_MODE,0,0,0,'',0,0,0,'','opt-slct minwidth100'); ?>
                     </td>
                 </tr>
                 <tr class="oddeven pgsz-optiontable-tr">
                     <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_options_params_defaulttax'); ?></td>               
                     <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_options_params_defaulttax_desc'); ?></td>
                     <td class="right pgsz-optiontable-field ">
-                        <select id="srff-default-tva" name="srff-default-tva" class="opt-slct">
-                            <?php
-                            // On recupere les taux de TVA
-                            $sql = "SELECT taux FROM ".MAIN_DB_PREFIX."c_tva WHERE fk_pays = '1' AND active = '1' ";
-                            $results_taux_tva = $db->query($sql); 
-
-                            $num = $db->num_rows($results_taux_tva); $i = 0;
-                            if ($num): while ($i < $num):
-                                $obj = $db->fetch_object($results_taux_tva);
-                                if ($obj): 
-                                    ?><option value="<?php echo $obj->taux; ?>" <?php if($obj->taux == $conf->global->SRFF_DEFAULT_TVA): echo 'selected'; endif; ?>><?php echo $obj->taux; ?>%</option><?php
-                                endif;
-                                $i++;
-                            endwhile; endif;
-                        ?>
-                        </select>
+                        <?php // echo $form->load_tva('srff-default-tva',$conf->global->SRFF_DEFAULT_TVA); ?>
+                        <?php echo $form->selectarray('srff-default-tva',$vat_rates,$conf->global->SRFF_DEFAULT_TVA,0,0,0,'',0,0,0,'','minwidth100'); ?>
                     </td>
                 </tr>
                 <tr class="oddeven pgsz-optiontable-tr">
@@ -303,19 +282,12 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfac
                     <td class="right pgsz-optiontable-field "><input type="checkbox" name="srff-showextrafactline" id="srff-showextrafactline" value="oui" <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
 
-                <?php var_dump($conf->global->SRFF_SHOWEXTRAFACTLINE,$extras_factureligne); ?>
-
-                <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE && !empty($extras_factureligne)): ?>
+                <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE && !empty($extralabels_factureligne)): ?>
                 <tr class="oddeven pgsz-optiontable-tr">
                     <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->trans('ffs_options_params_linkprojectslines'); ?></td>               
                     <td class="pgsz-optiontable-fielddesc"><?php echo $langs->trans('ffs_options_params_linkprojectslines_desc'); ?></td>
                     <td class="right pgsz-optiontable-field ">
-                        <select name="srff-lineprojectfield">
-                            <option value="0" <?php if($conf->global->SRFF_EXTRAFACTLINE_PROJECT == '0'): echo 'selected'; endif; ?>></option>
-                            <?php foreach($extras_factureligne as $field_key): ?>
-                                <option value="<?php echo $field_key; ?>" <?php if($conf->global->SRFF_EXTRAFACTLINE_PROJECT == $field_key): echo 'selected'; endif; ?>><?php echo $extrafields->attribute_label[$field_key]; ?></option>                                
-                            <?php endforeach;  ?>
-                        </select>
+                        <?php echo $form->selectarray('srff-lineprojectfield',$extralabels_factureligne,$conf->global->SRFF_EXTRAFACTLINE_PROJECT,1); ?>
                     </td>
                 </tr>
                 <?php else: ?>

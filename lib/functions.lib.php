@@ -105,53 +105,10 @@ function ffs_select_prodserv($tab_prodserv,$numero_ligne,$value = '',$input_erro
     return $select;
 }
 
-function ffs_select_tva($tab_tva,$numero_ligne,$value = 'default'){
-
-    global $db, $conf;
-
-    $select = '<select name="infofact-tva-'.$numero_ligne.'" id="infofact-tva-'.$numero_ligne.'" class="calc-tva minwidth100" data-linenum="'.$numero_ligne.'">';
-
-    foreach ($tab_tva as $taux_tva):
-        $select .= '<option value="'.$taux_tva.'" ';
-
-        // VERIFIER LE TAUX DE TVA PAR DEFAUT ET SI IL Y A DEJA UNE VALEUR RENSEIGNEE
-        if($value == 'default' && $taux_tva == $conf->global->SRFF_DEFAULT_TVA): $select .= 'selected';
-        else: if($taux_tva == $value): $select .= 'selected'; endif;
-        endif;   
-
-        $select .= '>';
-        $select .= $taux_tva.'%';
-        $select .= '</option>';
-    endforeach;
-
-    $select .= '</select>';
-
-    return $select;                               
-}
-
 function is_fielderror($field,$tab_errors){
     $class_error = '';
     if(in_array($field, $tab_errors)): $class_error = 'ffs-fielderror';endif;
     return $class_error;
-}
-
-function ffs_getTxTva($country = '1'){
-
-    global $db;
-
-    $tab_tva = array();
-
-    $sql = "SELECT taux FROM ".MAIN_DB_PREFIX."c_tva WHERE fk_pays = '".$country."' AND active = '1' ";
-    $results_taux_tva = $db->query($sql);
-
-    if ($results_taux_tva): $num = $db->num_rows($results_taux_tva); $i = 0;
-        while ($i < $num): $obj = $db->fetch_object($results_taux_tva);
-            if ($obj): array_push($tab_tva, $obj->taux); endif; 
-            $i++; 
-        endwhile;
-    endif;
-
-    return $tab_tva;
 }
 
 function ffs_getListProdServ($tab_cats){

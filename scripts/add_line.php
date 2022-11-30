@@ -23,7 +23,6 @@ if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.p
 if (! $res && file_exists("../../../main.inc.php")) $res=@include '../../../main.inc.php';
 
 
-
 /*******************************************************************
 * FONCTIONS
 ********************************************************************/
@@ -39,6 +38,8 @@ $prodservs = explode(',',$conf->global->SRFF_SERVERLIST);
 $gotoreg = $conf->global->SRFF_GOTOREG;
 $show_extrafields_facture = $conf->global->SRFF_SHOWEXTRAFACT;
 $show_extrafields_factureline = $conf->global->SRFF_SHOWEXTRAFACTLINE;
+
+$form = new Form($db);
 
 // On recupère la liste des services
 if($use_server_list):
@@ -68,7 +69,11 @@ else : $tab_prodserv = $prodservs;
 endif;
 
 // On recupere les taux de TVA
-$tab_tva = ffs_getTxTva($mysoc->country_id);
+$form->load_cache_vatrates("'".$mysoc->country_code."'");
+$vat_rates = array();
+foreach($form->cache_vatrates as $vat):
+    $vat_rates[$vat['txtva']] = $vat['label'];
+endforeach;
 
 // Variables
 $input_errors = array();
@@ -104,7 +109,7 @@ include_once('../lib/functions.lib.php'); ?>
     <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ht" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td>
     <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ttc" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td> 
     <td class="pgsz-optiontable-field right">
-        <?php if(!empty($tab_tva)): echo ffs_select_tva($tab_tva,GETPOST('viewnumber'));
+        <?php if(!empty($vat_rates)): echo $form->selectarray('infofact-tva-'.GETPOST('viewnumber'),$vat_rates,$conf->global->SRFF_DEFAULT_TVA,0,0,0,'data-linenum="'.GETPOST('viewnumber').'"',0,0,0,'','minwidth100 calc-tva');
         else: echo $langs->transnoentities('ffs_noVAT');
         endif; ?>
     </td>

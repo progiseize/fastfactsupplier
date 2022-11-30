@@ -9,8 +9,10 @@
 [comment]: <> (3.0 -> Interopérabilité ScanInvoice)
 
 ***
-### 2.6.5 (28/11/2022)
+### 2.7 (30/11/2022)
 * MAJ - Compatibilité MAIN_SECURITY_CSRF_TOKEN_RENEWAL_ON_EACH_CALL 
+* FIX - Compatibilité extrafields v15+ 
+* MAJ - Nombreuses mises à jour & corrections code 
 
 ### 2.6.4 (29/09/2022)
 * MAJ - Modification des permissions, pensez à verifier les droits utilisateurs
