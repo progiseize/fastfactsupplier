@@ -50,8 +50,7 @@ $action = GETPOST('action');
 /***************************************************
 * VIEW
 ****************************************************/
-llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css")); ?>
-
+llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array(),array(),'','fastfactsupplier doc'); ?>
 
 <div id="pgsz-option" class="fastfact">
 
