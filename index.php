@@ -41,6 +41,7 @@ require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.class.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 
 // On ajoute la class Produit si version < 10
+$version = explode('.', DOL_VERSION);
 if($version[0] < 10 ): require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php'; endif;
 
 // On ajoute la class Projet si activé
@@ -58,7 +59,7 @@ dol_include_once('./fastfactsupplier/lib/functions.lib.php');
 /*******************************************************************
 * CONFIGURATION
 ********************************************************************/
-$version = explode('.', DOL_VERSION);
+
 
 $use_server_list = $conf->global->SRFF_USESERVERLIST;
 $cats_to_use = json_decode($conf->global->SRFF_CATS);
