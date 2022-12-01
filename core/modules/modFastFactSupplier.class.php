@@ -75,8 +75,10 @@ class modFastFactSupplier extends DolibarrModules
         // Name of image file used for this module.
         // If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
         // If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
-        $this->picto='fa-file-invoice-dollar_file-invoice-dollar_fas_#263c5c'; //fa-fakey[_faprefix[_facolor[_fasize]]]<i class="fas fa-"></i>
-
+        $version = explode('.',DOL_VERSION);
+        if($version[0] > 16): $this->picto='fa-file-invoice-dollar_file-invoice-dollar_fas_#263c5c';
+        else: $this->picto='technic';
+        endif;
         // Defined all module parts (triggers, login, substitutions, menus, css, etc...)
         // for default path (eg: /mymodule/core/xxxxx) (0=disable, 1=enable)
         // for specific path of parts (eg: /mymodule/core/modules/barcode)
