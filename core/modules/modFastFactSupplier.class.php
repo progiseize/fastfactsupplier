@@ -252,7 +252,12 @@ class modFastFactSupplier extends DolibarrModules
             'titre'=> $this->name,
             'mainmenu'=>'progiseize',
             'leftmenu'=> $this->rights_class,
-            'url'=>'/fastfactsupplier/index.php', 'langs'=>'progiseize@progiseize', 'position'=> $this->module_position, 'enabled'=>'1', 'perms'=>'1','target'=>'', 'user'=>2);
+            'url'=>'/fastfactsupplier/index.php',
+            'langs'=>'progiseize@progiseize',
+            'position'=> $this->module_position, 'enabled'=>'1',
+            'perms'=>'1','target'=>'', 'user'=>2,
+            'prefix' => '<span class="fas fa-file-invoice-dollar" style="color: #6c6aa8;margin-right:3px;"></span> '
+        );
         $r++;
 
         $this->menu[$r]=array(

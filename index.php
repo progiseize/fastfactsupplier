@@ -338,8 +338,6 @@ if ($action == 'create' && $token == $_SESSION['token']):
 
     if(!$error):
 
-        var_dump($_POST);
-
         // ON VERIFIE SI LE TIERS A BESOIN D'ETRE CRÉÉ
         $is_already = GETPOST('is-already');
 
