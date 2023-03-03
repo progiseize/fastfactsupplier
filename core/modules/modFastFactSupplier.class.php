@@ -67,7 +67,7 @@ class modFastFactSupplier extends DolibarrModules
         $this->editor_url = 'https://www.progiseize.fr';
         
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-        $this->version = '2.7';
+        $this->version = '2.7.1';
         $this->url_last_version = "https://progiseize.fr/modules_info/".get_class($this)."_lastversion.txt";
 
         // Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
@@ -375,12 +375,8 @@ class modFastFactSupplier extends DolibarrModules
      */
     public function init($options='')
     {
-        
         //$this->_load_tables('/mymodule/sql/');
-
-        
         global $conf, $db;
-        dolibarr_set_const($db, "CHECKLASTVERSION_EXTERNALMODULE", '1', 'int', 0, '', $conf->entity);
 
         $sql = array();
         return $this->_init($sql, $options);

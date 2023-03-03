@@ -174,119 +174,105 @@ endforeach;
 ****************************************************/
 llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css"),'','fastfactsupplier'); ?>
 
-<div id="pgsz-option" class="fastfact">
+<div class="dolpgs-main-wrapper fastfact">
 
     <?php if(in_array('progiseize', $conf->modules)): ?>
-        <h1><?php echo $langs->transnoentities('ffs_page_title'); ?></h1>
+        <h1 class="has-before"><?php echo $langs->transnoentities('ffs_page_title'); ?></h1>
     <?php else : ?>
         <table class="centpercent notopnoleftnoright table-fiche-title"><tbody><tr class="titre"><td class="nobordernopadding widthpictotitle valignmiddle col-picto"><span class="fas fa-file-invoice-dollar valignmiddle widthpictotitle pictotitle" style=""></span></td><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><?php echo $langs->transnoentities('ffs_page_title'); ?></div></td></tr></tbody></table>
     <?php endif; ?>
-    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'setup','FastFactSupplier', 0,'fa-file-invoice-dollar_file-invoice-dollar_fas_#263c5c'); ?>
+    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'setup','FastFactSupplier', 0,'fa-file-invoice-dollar_file-invoice-dollar_fas'); ?>
 
+    <?php if(!in_array('progiseize', $conf->modules)): ?>
+        <div class="alert-message-need-base">
+            <i class="fas fa-info-circle" style="margin-right:5px;"></i> 
+            Cette version nécéssite le module PROGISEIZE pour fonctionner correctement. Vous pouvez la télécharger depuis Github en cliquant sur ce lien : <a href="https://github.com/progiseize/progiseize" target="_blank">Module Progiseize Github</a>
+        </div>
+    <?php endif; ?>
+    
     <form enctype="multipart/form-data" action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="POST" id="">
 
         <input type="hidden" name="action" value="setOptions">
         <input type="hidden" name="token" value="<?php echo newtoken(); ?>">
 
-        <table class="noborder centpercent pgsz-option-table" style="border-top:none;">
+        <h3 class="dolpgs-table-title"><?php echo $langs->trans('ffs_infosgen'); ?></h3>
+        <table class="dolpgs-table fastfact-table" style="border-top:none;">
             <tbody>
-
-                <?php // ARRIERE PLAN ?>
-                <tr class="titre">
-                    <td class="nobordernopadding valignmiddle col-title" style="" colspan="3">
-                        <div class="titre inline-block" style="padding:16px 0"><?php echo $langs->trans('ffs_options_cats'); ?></div>
-                    </td>
+                <tr class="dolpgs-thead" >
+                    <th colspan="3"><?php echo $langs->trans('ffs_options_cats'); ?></th>
                 </tr>
-                <tr class="liste_titre pgsz-optiontable-coltitle" >
-                    <th><?php echo $langs->trans('Parameter'); ?></th>
-                    <th><?php echo $langs->trans('Description'); ?></th>
-                    <th class="right"><?php echo $langs->trans('Value'); ?></th>
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_cats_usedolicats'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_cats_usedolicats_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-useserver" id="srff-useserver" value="oui" <?php if($conf->global->SRFF_USESERVERLIST): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
-
-                 <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->trans('ffs_options_cats_usedolicats'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php echo $langs->trans('ffs_options_cats_usedolicats_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field "><input type="checkbox" name="srff-useserver" id="srff-useserver" value="oui" <?php if($conf->global->SRFF_USESERVERLIST): ?>checked="checked"<?php endif; ?> /></td>
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_cats_usedolicats_ids'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_cats_usedolicats_ids_desc'); ?></td>
+                    <td class="right"><?php print $form->multiselectarray('srff-cats', $cate_arbo, $arrayselected, '', 0, '', 0, '100%'); ?></td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->trans('ffs_options_cats_usedolicats_ids'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php echo $langs->trans('ffs_options_cats_usedolicats_ids_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field "><?php print $form->multiselectarray('srff-cats', $cate_arbo, $arrayselected, '', 0, '', 0, '100%'); ?></td>
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_cats_predefined'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_cats_predefined_desc'); ?></td>
+                    <td class="right"><input type="text" name="srff-serverlist" id="srff-serverlist" style="width: 100%;" value="<?php if($conf->global->SRFF_SERVERLIST): echo $conf->global->SRFF_SERVERLIST; endif; ?>"></td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_options_cats_predefined'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_options_cats_predefined_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field "><input type="text" name="srff-serverlist" id="srff-serverlist" style="width: 100%;" value="<?php if($conf->global->SRFF_SERVERLIST): echo $conf->global->SRFF_SERVERLIST; endif; ?>"></td>
+            </tbody>
+            <tbody>                
+                <tr class="dolpgs-thead" >
+                    <th colspan="3"><?php echo $langs->trans('ffs_options_params'); ?></th>
                 </tr>
-
-                <tr class="titre">
-                    <td class="nobordernopadding valignmiddle col-title" style="" colspan="3">
-                        <div class="titre inline-block" style="padding:16px 0"><?php print $langs->trans('ffs_options_params'); ?></div>
-                    </td>
-                </tr>
-                <tr class="liste_titre pgsz-optiontable-coltitle" >
-                    <th><?php echo $langs->trans('Parameter'); ?></th>
-                    <th><?php echo $langs->trans('Description'); ?></th>
-                    <th class="right"><?php echo $langs->trans('Value'); ?></th>
-                </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_options_params_amountmode'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_options_params_amountmode_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field ">
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_params_amountmode'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_params_amountmode_desc'); ?></td>
+                    <td class="right">
                         <?php echo $form->selectarray('srff-amount-mode',array('ht' => 'HT','ttc' => 'TTC','both'=>'HT & TTC'),$conf->global->SRFF_AMOUNT_MODE,0,0,0,'',0,0,0,'','opt-slct minwidth100'); ?>
                     </td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_options_params_defaulttax'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_options_params_defaulttax_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field ">
+                <tr class="oddeven dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_params_defaulttax'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_params_defaulttax_desc'); ?></td>
+                    <td class="right">
                         <?php // echo $form->load_tva('srff-default-tva',$conf->global->SRFF_DEFAULT_TVA); ?>
                         <?php echo $form->selectarray('srff-default-tva',$vat_rates,$conf->global->SRFF_DEFAULT_TVA,0,0,0,'',0,0,0,'','minwidth100'); ?>
                     </td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->trans('ffs_options_params_bankaccount'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php echo $langs->trans('ffs_options_params_bankaccount_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field "><?php $form->select_comptes($conf->global->SRFF_BANKACCOUNT,'srff-bank-account',0,'',1); ?></td>
+                <tr class="oddeven dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_params_bankaccount'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_params_bankaccount_desc'); ?></td>
+                    <td class="right"><?php $form->select_comptes($conf->global->SRFF_BANKACCOUNT,'srff-bank-account',0,'',1); ?></td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->trans('ffs_options_params_gotoreg'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php echo $langs->trans('ffs_options_params_gotoreg_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field "><input type="checkbox" name="srff-gotoreg" id="srff-gotoreg" value="oui" <?php if($conf->global->SRFF_GOTOREG): ?>checked="checked"<?php endif; ?> /></td>
+                <tr class="oddeven dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_params_gotoreg'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_params_gotoreg_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-gotoreg" id="srff-gotoreg" value="oui" <?php if($conf->global->SRFF_GOTOREG): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->trans('ffs_options_params_use_extrauploadfile'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php echo $langs->trans('ffs_options_params_use_extrauploadfile_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field "><input type="checkbox" name="srff-usecustomfield-uploadfile" id="srff-usecustomfield-uploadfile" value="oui" <?php if($conf->global->SRFF_USECUSTOMFIELD_UPLOADFILE): ?>checked="checked"<?php endif; ?> /></td>
+                <tr class="oddeven dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_params_use_extrauploadfile'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_params_use_extrauploadfile_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-usecustomfield-uploadfile" id="srff-usecustomfield-uploadfile" value="oui" <?php if($conf->global->SRFF_USECUSTOMFIELD_UPLOADFILE): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
-
-                 <tr class="titre">
-                    <td class="nobordernopadding valignmiddle col-title" style="" colspan="3">
-                        <div class="titre inline-block" style="padding:16px 0"><?php echo $langs->trans('ffs_options_customfields'); ?></div>
-                    </td>
-                </tr>
-                <tr class="liste_titre pgsz-optiontable-coltitle" >
-                    <th><?php echo $langs->trans('Parameter'); ?></th>
-                    <th><?php echo $langs->trans('Description'); ?></th>
-                    <th class="right"><?php echo $langs->trans('Value'); ?></th>
+            </tbody>
+            <tbody>
+                <tr class="liste_titre dolpgs-thead" >
+                    <th colspan="3"><?php echo $langs->trans('ffs_options_customfields'); ?></th>
                 </tr>
                 
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_options_customfields_invoice'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_options_customfields_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field "><input type="checkbox" name="srff-showextrafact" id="srff-showextrafact" value="oui" <?php if($conf->global->SRFF_SHOWEXTRAFACT): ?>checked="checked"<?php endif; ?> /></td>
+                <tr class="oddeven dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_customfields_invoice'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_customfields_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-showextrafact" id="srff-showextrafact" value="oui" <?php if($conf->global->SRFF_SHOWEXTRAFACT): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_options_customfields_invoiceline'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_options_customfields_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field "><input type="checkbox" name="srff-showextrafactline" id="srff-showextrafactline" value="oui" <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE): ?>checked="checked"<?php endif; ?> /></td>
+                <tr class="oddeven dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_customfields_invoiceline'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_customfields_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-showextrafactline" id="srff-showextrafactline" value="oui" <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
 
                 <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE && !empty($extralabels_factureligne)): ?>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->trans('ffs_options_params_linkprojectslines'); ?></td>               
-                    <td class="pgsz-optiontable-fielddesc"><?php echo $langs->trans('ffs_options_params_linkprojectslines_desc'); ?></td>
-                    <td class="right pgsz-optiontable-field ">
+                <tr class="oddeven dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_params_linkprojectslines'); ?></td>               
+                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_params_linkprojectslines_desc'); ?></td>
+                    <td class="right">
                         <?php echo $form->selectarray('srff-lineprojectfield',$extralabels_factureligne,$conf->global->SRFF_EXTRAFACTLINE_PROJECT,1); ?>
                     </td>
                 </tr>
@@ -298,8 +284,8 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfac
             </tbody>
         </table>
         <div class="right pgsz-buttons" style="padding:16px 0;">
-            <input type="button" class="button pgsz-button-cancel" value="<?php print $langs->trans('ffs_cancel'); ?>" onclick="javascript:history.go(-1)">
-            <input type="submit" class="button pgsz-button-submit" name="" value="<?php print $langs->trans('ffs_save'); ?>">
+            <input type="button" class="dolpgs-btn btn-danger btn-sm" value="<?php print $langs->trans('ffs_cancel'); ?>" onclick="javascript:history.go(-1)">
+            <input type="submit" class="dolpgs-btn btn-primary btn-sm" name="" value="<?php print $langs->trans('ffs_save'); ?>">
         </div>
     </form>
 

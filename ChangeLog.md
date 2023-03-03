@@ -9,6 +9,10 @@
 [comment]: <> (3.0 -> Interopérabilité ScanInvoice)
 
 ***
+### 2.7.1 (03/03/2023)
+* MAJ - CSS externalisé - Feuille de style commune module PROGISEIZE, nécéssite la version 1.4+
+* FIX - remove var_dump
+
 ### 2.7 (30/11/2022)
 * MAJ - Compatibilité MAIN_SECURITY_CSRF_TOKEN_RENEWAL_ON_EACH_CALL 
 * FIX - Compatibilité extrafields v15+ 
