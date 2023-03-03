@@ -554,19 +554,26 @@ $date_limit = GETPOST("creafact-datelim"); if(empty($date_limit)): $date_limit =
 llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css"),'','fastfactsupplier saisie'); ?>
 
 <!-- CONTENEUR GENERAL -->
-<div id="pgsz-option" class="fastfact">
+<div class="dolpgs-main-wrapper fastfact">
 
     <input type="hidden" id="fastfact-lang" value="<?php echo $langs->defaultlang; ?>">
 
     <?php if(in_array('progiseize', $conf->modules)): ?>
-        <h1><?php echo $langs->transnoentities('ffs_page_title'); ?></h1>
+        <h1 class="has-before"><?php echo $langs->transnoentities('ffs_page_title'); ?></h1>
     <?php else : ?>
         <table class="centpercent notopnoleftnoright table-fiche-title"><tbody><tr class="titre"><td class="nobordernopadding widthpictotitle valignmiddle col-picto"><span class="fas fa-file-invoice-dollar valignmiddle widthpictotitle pictotitle" style=""></span></td><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><?php echo $langs->transnoentities('ffs_page_title'); ?></div></td></tr></tbody></table>
     <?php endif; ?>
-    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'saisir','FastFactSupplier', 0,'fa-file-invoice-dollar_file-invoice-dollar_fas_#263c5c'); ?>
+    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'saisir','FastFactSupplier', 0,'fa-file-invoice-dollar_file-invoice-dollar_fas'); ?>
+
+    <?php if(!in_array('progiseize', $conf->modules)): ?>
+        <div class="alert-message-need-base">
+            <i class="fas fa-info-circle" style="margin-right:5px;"></i> 
+            Cette version nécéssite le module PROGISEIZE pour fonctionner correctement. Vous pouvez la télécharger depuis Github en cliquant sur ce lien : <a href="https://github.com/progiseize/progiseize" target="_blank">Module Progiseize Github</a>
+        </div>
+    <?php endif; ?>
 
     <?php if($user->rights->fastfactsupplier->saisir): ?>
-    <form enctype="multipart/form-data" action="<?php print $_SERVER["PHP_SELF"]; ?>" method="post">
+    <form enctype="multipart/form-data" action="<?php print $_SERVER["PHP_SELF"]; ?>" method="POST">
 
         <input type="hidden" name="action" value="create">
         <input type="hidden" name="new_reffourn" id="new_reffourn" value="<?php echo $societe->code_fournisseur; ?>">
@@ -577,22 +584,15 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
         <input type="hidden" name="ffs_amout_mode" value="<?php echo $conf->global->SRFF_AMOUNT_MODE; ?>">
 
         <!-- INFOS FACTURE -->
-        <table class="noborder centpercent pgsz-option-table fastfact-table" style="border-top:none;">
+        <h3 class="dolpgs-table-title"><?php echo $langs->trans('ffs_infosgen'); ?></h3>
+        <table class="dolpgs-table fastfact-table">
             <tbody>
-
-                <?php // ?>
-                <tr class="titre">
-                    <td class="nobordernopadding valignmiddle col-title" style="" colspan="2">
-                        <div class="titre inline-block" style="padding:16px 0"><?php echo $langs->trans('ffs_infosgen'); ?></div>
-                    </td>
-                </tr>
-
-                <tr class="liste_titre pgsz-optiontable-coltitle">
+                <tr class="dolpgs-thead left">
                     <th colspan="2"><?php echo $langs->trans('ffs_infosgen_tiers'); ?></th>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->transnoentities('ffs_infosgen_tiers_name'); ?> <span class="required">*</span></td>
-                    <td class="fournisseur-zone right pgsz-optiontable-field">
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php echo $langs->transnoentities('ffs_infosgen_tiers_name'); ?> <span class="required">*</span></td>
+                    <td class="fournisseur-zone right ">
                         <select id="creatiers-nom" class="quatrevingtpercent" name="creatiers-nom" data-addclass="<?php echo is_fielderror('creatiers-nom',$input_errors); ?>" data-numfacturl="<?php echo $new_script_file.'scripts/numfact.php'; ?>">
                             <option></option>
                             <?php echo $list_options_fournisseurs; ?>
@@ -600,59 +600,62 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                         <input type="text" name="creatiers-codefournisseur" id="creatiers-codefournisseur" value="<?php echo $code_fournisseur; ?>" style="opacity:0.6;" readonly />
                     </td>
                 </tr> 
+            </tbody>
+            <tbody>
 
-                <tr class="liste_titre pgsz-optiontable-coltitle">
-                    <th colspan="2"><?php echo $langs->transnoentities('ffs_infosgen_facture'); ?> <span class="txt-numfact" style="font-size: 0.8em;"></span></th>
+                <tr class="dolpgs-thead left">
+                    <th colspan="2"><?php echo $langs->transnoentities('ffs_infosgen_facture'); ?> <span class="txt-numfact"></span></th>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php echo $langs->transnoentities('ffs_infosgen_facture_libelle'); ?></td>
-                    <td class="right pgsz-optiontable-field">
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php echo $langs->transnoentities('ffs_infosgen_facture_libelle'); ?></td>
+                    <td class="right">
                         <?php $post_libelle = GETPOST('creafact-libelle','alpha'); ?>
                         <input type="text" name="creafact-libelle" id="creafact-libelle" value="<?php if (!empty($post_libelle)): echo $post_libelle; endif; ?>" />
                     </td>
                 </tr>
-
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_infosgen_facture_ref'); ?> <span class="required">*</span></td>
-                    <td class="right pgsz-optiontable-field">
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_infosgen_facture_ref'); ?> <span class="required">*</span></td>
+                    <td class="right">
                         <?php $post_reffourn = GETPOST('creafact-reffourn','alpha'); ?>
                         <input type="text" data-checkrefurl="<?php echo $new_script_file.'scripts/verif_reffourn.php'; ?>" name="creafact-reffourn" id="creafact-reffourn" class="<?php echo is_fielderror('creafact-reffourn',$input_errors); ?>" value="<?php if (!empty($post_reffourn)): echo $post_reffourn; endif; ?>"  />
                     </td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_infosgen_facture_date'); ?> <span class="required">*</span></td>
-                    <td class="right pgsz-optiontable-field">
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_infosgen_facture_date'); ?> <span class="required">*</span></td>
+                    <td class="right">
                         <input type="text" name="creafact-datefact" id="creafact-datefact" value="<?php echo $date_facturation; ?>" class="datepick <?php echo is_fielderror('creafact-datefact',$input_errors); ?>" />
                     </td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_infosgen_facture_datelim'); ?> <span class="required">*</span></td>
-                    <td class="right pgsz-optiontable-field">
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_infosgen_facture_datelim'); ?> <span class="required">*</span></td>
+                    <td class="right">
                         <input type="text" name="creafact-datelim" id="creafact-datelim" value="<?php echo $date_limit; ?>" class="datepick <?php echo is_fielderror('creafact-datelim',$input_errors); ?>" />
                     </td>
                 </tr>
                 <?php if($conf->global->SRFF_BANKACCOUNT != '-1'): ?>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_infosgen_facture_bankaccount'); ?></td>
-                    <td class="right pgsz-optiontable-field">
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_infosgen_facture_bankaccount'); ?></td>
+                    <td class="right">
                         <?php $form->select_comptes(GETPOSTISSET('srff-bank-account') ? GETPOST('srff-bank-account') : $conf->global->SRFF_BANKACCOUNT,'srff-bank-account',0,'',1,'',0,'minwidth300'); ?>
                     </td>
                 </tr>
                 <?php endif; ?>
+            </tbody>
+            <tbody>
 
-                <tr class="liste_titre pgsz-optiontable-coltitle">
+                <tr class="dolpgs-thead left">
                     <th colspan="2"><?php echo $langs->trans('ffs_infosgen_actions'); ?></th>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_infosgen_actions_redirect'); ?></td>
-                    <td class="right pgsz-optiontable-field"><span class="redirect-active <?php if($gotoreg): echo 'show'; endif; ?>"><?php print $langs->transnoentities('ffs_infosgen_actions_redirect_active'); ?></span>
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_infosgen_actions_redirect'); ?></td>
+                    <td class="right"><span class="redirect-active <?php if($gotoreg): echo 'show'; endif; ?>"><?php print $langs->transnoentities('ffs_infosgen_actions_redirect_active'); ?></span>
                         <input type="checkbox" id="creafact-redirect" name="creafact-redirect" <?php if($gotoreg): echo 'checked="checked"'; endif; ?>>
                     </td>
                 </tr>
                 <?php if (!empty($conf->projet->enabled)): ?>
-                    <tr class="oddeven pgsz-optiontable-tr">
-                        <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_infosgen_actions_setproject'); ?></td>
-                        <td class="right pgsz-optiontable-field">
+                    <tr class="dolpgs-tbody">
+                        <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_infosgen_actions_setproject'); ?></td>
+                        <td class="right">
                             <?php $options_creafact_projet = $formproject->select_projects_list(-1,$selected = '','creafact-projet',$maxlength = '',$option_only = 1,$show_empty = 1,$discard_closed = 1,$forcefocus = 0,$disabled = 0,$mode = 1,$filterkey = '',$nooutput = 1,$forceaddid = 0,$morecss = '',$htmlid = '' );?>
                             <select id="creafact-projet" name="creafact-projet" class="minwidth300">
                                 <option></option>
@@ -663,6 +666,8 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                       </td>
                 </tr>
                 <?php endif; ?>
+            </tbody>
+
 
                 <?php // EXTRAFIELDS FACTURE                        
                 if($show_extrafields_facture): 
@@ -679,45 +684,50 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                     // SI IL Y A DES CHAMPS VISIBLES
                     if($nb_extrafacture > 0): ?>
 
-                        <tr class="liste_titre pgsz-optiontable-coltitle">
-                            <th colspan="2"><?php echo $langs->transnoentities('ffs_infosgen_customfields'); ?></th>
-                        </tr>
+                        <tbody>
 
-                        <?php
-                        // POUR CHAQUE CHAMP VISIBLE
-                        foreach($visible_extrafacture as $key_exf => $exf):
-
-                            $exf_type = $extrafields->attributes['facture_fourn']['type'][$key_exf];
-                            $exf_label = $extrafields->attributes['facture_fourn']['label'][$key_exf];
-                            $exf_required = $extrafields->attributes['facture_fourn']['required'][$key_exf];
-
-                            $value_extrafield = GETPOST('options_'.$key_exf); if (is_array($value_extrafield)): $value_extrafield = implode(',', $value_extrafield); endif;
-                            $class_extrafield = ''; if(in_array('options_'.$key_exf, $input_errors)):  $class_extrafield .= ' ffs-fielderror'; endif;
-
-                            ?>
-                            
-                            <tr class="oddeven pgsz-optiontable-tr type-<?php echo $exf_type; ?>">                                        
-
-                            <?php // AFFICHAGE TEXTAREA - COLSPAN 2
-                            if($exf_type == 'text'): ?> 
-                                <td colspan="2" class="bold pgsz-optiontable-fieldname">
-                                    <?php echo $exf_label; ?> <?php if($exf_required == '1'): ?> <span class="required">*</span> <?php endif; ?><br/> 
-                                    <textarea id="options_<?php echo $key_exf; ?>" name="options_<?php echo $key_exf; ?>" class="flat <?php echo $class_extrafield; ?> type-<?php echo $exf_type; ?>"></textarea>
-                                </td>
-
-                            <?php // AFFICHAGE NORMAL / 2 COLONNES
-                            else: ?>
-                                <td class="bold pgsz-optiontable-fieldname"><?php echo $exf_label; ?><?php if($exf_required == '1'): ?> <span class="required">*</span> <?php endif; ?></td>
-                                <td class="right pgsz-optiontable-field">
-                                    <?php echo $extrafields->showInputField($key_exf,$value_extrafield,'','','',$class_extrafield,$facture->id,$facture->table_element); ?>
-                                </td>
-                            <?php
-                            endif; ?>
-
+                            <tr class="dolpgs-thead left">
+                                <th colspan="2"><?php echo $langs->transnoentities('ffs_infosgen_customfields'); ?></th>
                             </tr>
-                            <?php 
 
-                        endforeach; 
+                            <?php
+                            // POUR CHAQUE CHAMP VISIBLE
+                            foreach($visible_extrafacture as $key_exf => $exf):
+
+                                $exf_type = $extrafields->attributes['facture_fourn']['type'][$key_exf];
+                                $exf_label = $extrafields->attributes['facture_fourn']['label'][$key_exf];
+                                $exf_required = $extrafields->attributes['facture_fourn']['required'][$key_exf];
+
+                                $value_extrafield = GETPOST('options_'.$key_exf); if (is_array($value_extrafield)): $value_extrafield = implode(',', $value_extrafield); endif;
+                                $class_extrafield = ''; if(in_array('options_'.$key_exf, $input_errors)):  $class_extrafield .= ' ffs-fielderror'; endif;
+
+                                ?>
+                                
+                                <tr class="dolpgs-tbody type-<?php echo $exf_type; ?>">                                        
+
+                                <?php // AFFICHAGE TEXTAREA - COLSPAN 2
+                                if($exf_type == 'text'): ?> 
+                                    <td colspan="2" class="dolpgs-font-medium">
+                                        <?php echo $exf_label; ?> <?php if($exf_required == '1'): ?> <span class="required">*</span> <?php endif; ?><br/> 
+                                        <textarea id="options_<?php echo $key_exf; ?>" name="options_<?php echo $key_exf; ?>" class="flat <?php echo $class_extrafield; ?> type-<?php echo $exf_type; ?>"></textarea>
+                                    </td>
+
+                                <?php // AFFICHAGE NORMAL / 2 COLONNES
+                                else: ?>
+                                    <td class="dolpgs-font-medium"><?php echo $exf_label; ?><?php if($exf_required == '1'): ?> <span class="required">*</span> <?php endif; ?></td>
+                                    <td class="right">
+                                        <?php echo $extrafields->showInputField($key_exf,$value_extrafield,'','','',$class_extrafield,$facture->id,$facture->table_element); ?>
+                                    </td>
+                                <?php
+                                endif; ?>
+
+                                </tr>
+                                <?php 
+
+                            endforeach; ?>
+
+                        </tbody>
+                    <?php
                     endif;
                 endif; ?>
 
@@ -725,17 +735,11 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
         </table>
 
         <!-- LIGNES DE FACTURE -->
-        <table class="noborder centpercent pgsz-option-table fastfact-table" style="border-top:none;" id="fastfact-tablelines">
+        <h3 class="dolpgs-table-title"><?php echo $langs->trans('ffs_details'); ?></h3>
+        <table class="dolpgs-table fastfact-table" id="fastfact-tablelines">
             <tbody>
-
-                <tr class="titre">
-                    <td class="nobordernopadding valignmiddle col-title" style="" colspan="8">
-                        <div class="titre inline-block" style="padding:16px 0"><?php echo $langs->trans('ffs_details'); ?></div>
-                    </td>
-                </tr>
-
-                <tr class="liste_titre pgsz-optiontable-coltitle">
-                    <th><?php echo $langs->trans('ffs_details_prodserv'); ?></th>
+                <tr class="dolpgs-thead noborderside ">
+                    <th><?php echo $langs->trans('ffs_details_prodserv'); ?> <span class="required">*</span></th>
                     <?php if($show_extrafields_factureline): // ON RECUPERE LES CHAMPS VISIBLES
                         $visible_extrafacture_ligne = array();
                         foreach($extralabels_factureligne as $key_exfl => $exfl):
@@ -747,15 +751,15 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                             <?php endif;
                         endforeach;
                     endif; ?>
-                    <th class="<?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><?php echo $langs->transnoentities('ffs_details_amountht'); ?></th>
-                    <th class="<?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><?php echo $langs->transnoentities('ffs_details_amountttc'); ?></th>
-                    <th class="right"><?php echo $langs->transnoentities('ffs_details_amounttax'); ?></th>
+                    <th class="<?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><?php echo $langs->transnoentities('ffs_details_amountht'); ?> <span class="required">*</span></th>
+                    <th class="<?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><?php echo $langs->transnoentities('ffs_details_amountttc'); ?> <span class="required">*</span></th>
+                    <th class="right"><?php echo $langs->transnoentities('ffs_details_amounttax'); ?> <span class="required">*</span></th>
                 </tr>
 
                 <?php // SI IL N'Y A PAS ENCORE DE LIGNES ?>
                 <?php if($nb_lines == 0 && empty($facture_lines)): ?>
 
-                    <tr id="linefact-1" class="oddeven pgsz-optiontable-tr linefact">
+                    <tr id="linefact-1" class="oddeven dolpgs-tbody linefact">
                         <td class="pgsz-optiontable-field pdxline">
                             <input type="hidden" name="infofact-saisie-1" id="infofact-saisie-1" value="">
                             <?php echo ffs_select_prodserv($tab_prodserv,1,'',$input_errors); ?>
@@ -792,7 +796,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
 
                 <?php else: $i= 0; foreach($facture_lines as $line): $i++; ?>
 
-                    <tr id="linefact-<?php echo $i; ?>" class="oddeven pgsz-optiontable-tr linefact">
+                    <tr id="linefact-<?php echo $i; ?>" class="oddeven dolpgs-tbody linefact">
                         <td class="pgsz-optiontable-field pdxline">
                             <input type="hidden" name="infofact-saisie-<?php echo $i; ?>" id="infofact-saisie-<?php echo $i; ?>" value="<?php echo $line['type_saisie']; ?>" >
                             <?php echo ffs_select_prodserv($tab_prodserv,$i,$line['label'],$input_errors); ?>
@@ -830,15 +834,15 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
         </table>
 
         <!-- BOUTONS ET TOTAL LIGNE DE FACTURE -->
-        <table class="centpercent pgsz-option-table fastfact-table" style="border-top:none;">
+        <table class="dolpgs-table fastfact-table dolpgs-nohovertable">
             <tbody>
-                <tr class="oddeven pgsz-optiontable-tr">
+                <tr class="dolpgs-tbody nopadding withoutborder">
                     <td valign="top">
-                        <input type="button" value="<?php echo $langs->transnoentities('ffs_details_addline'); ?>" id="add-facture-line" class="fastfact-button btn-small" data-addurl="<?php echo $new_script_file.'scripts/add_line.php'; ?>" />
+                        <input type="button" value="<?php echo $langs->transnoentities('ffs_details_addline'); ?>" id="add-facture-line" class="dolpgs-btn btn-primary btn-sm" data-addurl="<?php echo $new_script_file.'scripts/add_line.php'; ?>" />
                         <?php if($facture_lines && count($facture_lines) > 1): $display = 'inline-block'; else: $display = 'none'; endif; ?>
-                        <input type="button" value="<?php echo $langs->transnoentities('ffs_details_delline'); ?>" id="del-facture-line" style="display:<?php echo $display; ?>;" class="fastfact-button btn-alt btn-small" />
+                        <input type="button" value="<?php echo $langs->transnoentities('ffs_details_delline'); ?>" id="del-facture-line" style="display:<?php echo $display; ?>;" class="dolpgs-btn btn-danger btn-sm" />
                     </td>
-                    <td valign="top" class="right nopaddingright">
+                    <td valign="top" class="right">
                         <div id="ht-amount" class="ffs-bold"><?php echo $langs->transnoentities('ffs_tabletotal_ht'); ?>: <span class="ff-amount"><span class="calcul-zone-ht"><?php echo number_format($calcul_ht,2); ?></span> <?php echo $langs->getCurrencySymbol($conf->currency); ?></span></div>
                         <div id="tva-amount" class="ffs-bold"><?php echo $langs->transnoentities('ffs_tabletotal_tax'); ?>: <span class="ff-amount"><span class="calcul-zone-tva"><?php echo number_format($calcul_tva,2); ?></span> <?php echo $langs->getCurrencySymbol($conf->currency); ?></span></div>
                         <div id="ttc-amount" class="ffs-bold"><?php echo $langs->transnoentities('ffs_tabletotal_ttc'); ?>: <span class="ff-amount"><span class="calcul-zone-ttc"><?php echo number_format($calcul_ttc,2); ?></span> <?php echo $langs->getCurrencySymbol($conf->currency); ?></span></div>
@@ -847,21 +851,16 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
             </tbody>
         </table>
 
-        <div style="clear: both;"></div>
-
-        
-        <table class="noborder centpercent pgsz-option-table fastfact-table" style="border-top:none;">
-            <tbody>
-                <tr class="titre">
-                    <td class="nobordernopadding valignmiddle col-title" style="" colspan="2">
-                        <div class="titre inline-block" style="padding:16px 0"><?php echo $langs->trans('ffs_docs'); ?></div>
-                    </td>
-                </tr>
+        <!-- DOCS -->
+        <h3 class="dolpgs-table-title"><?php echo $langs->trans('ffs_docs'); ?></h3>
+        <table class="dolpgs-table fastfact-table" style="border-top:none;">
+            
+            <tbody>                
                 <?php if($conf->global->MAIN_UPLOAD_DOC): ?>
-                <tr class="liste_titre pgsz-optiontable-coltitle">
+                <tr class="dolpgs-thead">
                     <th colspan="2"><?php print $langs->transnoentities('ffs_docs_uploadfile'); ?></th>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
+                <tr class="dolpgs-tbody nopadding fastfact-drop">
                     <td class="ffs-nopadding" colspan="2">
                         <div id="zone-drop" data-maxsize="<?php echo $maxfilesize; ?>">
                             <div id="zone-drop-infos"><?php echo $langs->transnoentities('ffs_docs_dragndrop',$maxfilesize_mo); ?></div>
@@ -871,18 +870,18 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                     </td>
                 </tr>
                 <?php endif; ?>
-                <tr class="liste_titre pgsz-optiontable-coltitle">
+                <tr class="liste_titre dolpgs-thead">
                     <th colspan="2"><?php print $langs->transnoentities('ffs_docs_link'); ?></th>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_docs_linkurl'); ?> <span class="required">*</span></td>
-                    <td class="right pgsz-optiontable-field">
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_docs_linkurl'); ?> <span class="required">*</span></td>
+                    <td class="right">
                         <input type="url" name="creafact-linkurl" id="creafact-linkurl" placeholder="https://example.com" pattern="https://.*">
                     </td>
                 </tr>
-                <tr class="oddeven pgsz-optiontable-tr">
-                    <td class="bold pgsz-optiontable-fieldname"><?php print $langs->transnoentities('ffs_docs_linklabel'); ?> <span class="required">*</span></td>
-                    <td class="right pgsz-optiontable-field">
+                <tr class="dolpgs-tbody">
+                    <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_docs_linklabel'); ?> <span class="required">*</span></td>
+                    <td class="right">
                         <input type="text" name="creafact-linklib" placeholder="<?php print $langs->transnoentities('ffs_docs_linklib'); ?>">
                     </td>
                 </tr>
@@ -891,8 +890,8 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
         </table>
 
         <div id="" style="text-align: right; margin-top: 16px;">                
-            <input type="button" class="fastfact-button btn-alt" value="<?php print $langs->transnoentities('ffs_cancel'); ?>" onclick="javascript:history.go(-1)">
-            <input type="submit" class="fastfact-button" value="<?php print $langs->transnoentities('ffs_save_invoice'); ?>">
+            <input type="button" class="dolpgs-btn btn-danger btn-sm" value="<?php print $langs->transnoentities('ffs_cancel'); ?>" onclick="javascript:history.go(-1)">
+            <input type="submit" class="dolpgs-btn btn-primary btn-sm" value="<?php print $langs->transnoentities('ffs_save_invoice'); ?>">
         </div>
     </form>
     <?php endif; ?>

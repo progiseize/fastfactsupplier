@@ -88,8 +88,8 @@ $extraf_visibletab = array('1','3');
 
 include_once('../lib/functions.lib.php'); ?>
 
-<tr id="linefact-<?php echo GETPOST('viewnumber') ?>" class="oddeven pgsz-optiontable-tr linefact">
-    <td class="pgsz-optiontable-field">
+<tr id="linefact-<?php echo GETPOST('viewnumber') ?>" class="dolpgs-tbody linefact">
+    <td class="">
         <input type="hidden" name="infofact-saisie-<?php echo GETPOST('viewnumber'); ?>" id="infofact-saisie-<?php echo GETPOST('viewnumber'); ?>" value="" >
         <?php echo ffs_select_prodserv($tab_prodserv,GETPOST('viewnumber'),'',$input_errors); ?>
     </td>
@@ -106,9 +106,9 @@ include_once('../lib/functions.lib.php'); ?>
             </td>
         <?php endif; endforeach; ?>
     <?php endif; ?>
-    <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ht" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td>
-    <td class="pgsz-optiontable-field <?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ttc" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td> 
-    <td class="pgsz-optiontable-field right">
+    <td class="<?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ht" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td>
+    <td class="<?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ttc" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td> 
+    <td class="right">
         <?php if(!empty($vat_rates)): echo $form->selectarray('infofact-tva-'.GETPOST('viewnumber'),$vat_rates,$conf->global->SRFF_DEFAULT_TVA,0,0,0,'data-linenum="'.GETPOST('viewnumber').'"',0,0,0,'','minwidth100 calc-tva');
         else: echo $langs->transnoentities('ffs_noVAT');
         endif; ?>

@@ -314,7 +314,7 @@ if (jQuery('body').hasClass('fastfactsupplier') && jQuery('body').hasClass('sais
 
         //console.log(verifSize);
 
-        var msg = '<span class="bold">' + this.files[0].name + '</span> (' + s + ' Ko)';
+        var msg = '<span class="zone-drop-file">' + this.files[0].name + '</span> (' + s + ' Ko)';
 
         if(sendSize >= verifSize){
             msg += '<br/><span class="bold" style="color:#b22525;font-size:10px;"><i class="fa fa-close"></i> '+traductionTxt['ffs_fielderror_filetoobig']+'</span>';

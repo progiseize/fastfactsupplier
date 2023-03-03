@@ -210,15 +210,22 @@ endif;
 
 llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css"),'','fastfactsupplier insert'); ?>
 
-<div id="pgsz-option" class="fastfact">
+<div class="dolpgs-main-wrapper fastfact">
 
     <?php if(in_array('progiseize', $conf->modules)): ?>
-        <h1><?php echo $langs->transnoentities('ffs_page_title'); ?></h1>
+        <h1 class="has-before"><?php echo $langs->transnoentities('ffs_page_title'); ?></h1>
     <?php else : ?>
         <table class="centpercent notopnoleftnoright table-fiche-title"><tbody><tr class="titre"><td class="nobordernopadding widthpictotitle valignmiddle col-picto"><span class="fas fa-file-invoice-dollar valignmiddle widthpictotitle pictotitle" style=""></span></td><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><?php echo $langs->transnoentities('ffs_page_title'); ?></div></td></tr></tbody></table>
     <?php endif; ?>
-    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'insert','FastFactSupplier', 0,'fa-file-invoice-dollar_file-invoice-dollar_fas_#263c5c'); ?>
+    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'insert','FastFactSupplier', 0,'fa-file-invoice-dollar_file-invoice-dollar_fas'); ?>
 
+    <?php if(!in_array('progiseize', $conf->modules)): ?>
+        <div class="alert-message-need-base">
+            <i class="fas fa-info-circle" style="margin-right:5px;"></i> 
+            Cette version nécéssite le module PROGISEIZE pour fonctionner correctement. Vous pouvez la télécharger depuis Github en cliquant sur ce lien : <a href="https://github.com/progiseize/progiseize" target="_blank">Module Progiseize Github</a>
+        </div>
+    <?php endif; ?>
+    
     <?php if($langs->shortlang == 'fr'): ?>
 
         <form enctype="multipart/form-data" action="<?php print $_SERVER["PHP_SELF"]; ?>" method="post" id="">
@@ -226,48 +233,41 @@ llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',array("/fastfactsupplier
             <input type="hidden" name="token" value="<?php echo newtoken(); ?>">
 
             <?php //var_dump($tab_img); ?>
-
-            <table class="noborder centpercent pgsz-option-table" style="border-top:none;">
+            <h3 class="dolpgs-table-title"><?php echo $langs->trans('ffs_cc_title_list'); ?></h3>
+            <table class="dolpgs-table fastfact-table">
                 <tbody>
-
-                    <?php // ?>
-                    <tr class="titre">
-                        <td class="nobordernopadding valignmiddle col-title" style="" colspan="3">
-                            <div class="titre inline-block" style="padding:16px 0"><?php echo $langs->trans('ffs_cc_title_list'); ?></div>
-                        </td>
-                    </tr>
-                    <tr class="liste_titre pgsz-optiontable-coltitle" >
+                    <tr class="dolpgs-thead noborderside">
                         <th><?php echo $langs->trans('Label'); ?></th>
                         <th><?php echo $langs->trans('ffs_codecomptable'); ?></th>
                         <th class="right"><a href="#" id="toggle_untoggle" style="font-size: 0.9em;color: #424242;font-style: italic;margin-left: 6px;"><?php print $langs->trans('ffs_cc_toggle_untoggle'); ?></a></th>
                     </tr>
                     <?php  $i = 0; foreach ($ccs as $cc_key => $cc_label): $i++; ?>
-                    <tr class="oddeven pgsz-optiontable-tr">
-                        <td class="bold pgsz-optiontable-fieldname"><?php echo stripcslashes($cc_label); ?></td>               
-                        <td class="pgsz-optiontable-fielddesc"><?php echo $cc_key; ?></td>
-                        <td class="right pgsz-optiontable-field "><input type="checkbox" name="tab_cc[]" value="<?php echo $cc_key; ?>" class="toguntog"></td>
+                    <tr class="dolpgs-tbody">
+                        <td class="dolpgs-font-medium"><?php echo stripcslashes($cc_label); ?></td>               
+                        <td class="dolpgs-color-gray-i"><?php echo $cc_key; ?></td>
+                        <td class="right"><input type="checkbox" name="tab_cc[]" value="<?php echo $cc_key; ?>" class="toguntog"></td>
                     </tr>
                     <?php endforeach; ?>
+                </tbody>
+            </table>
 
-                    <tr class="titre">
-                        <td class="nobordernopadding valignmiddle col-title" style="" colspan="3">
-                            <div class="titre inline-block" style="padding:16px 0"><?php echo $langs->trans('ffs_cc_title_options'); ?></div>
-                        </td>
-                    </tr>
-                     <tr class="liste_titre pgsz-optiontable-coltitle" >
+            <h3 class="dolpgs-table-title"><?php echo $langs->trans('ffs_cc_title_options'); ?></h3>
+            <table class="dolpgs-table fastfact-table">
+                <tbody>
+                     <tr class="dolpgs-thead noborderside">
                         <th><?php echo $langs->trans('Parameter'); ?></th>
                         <th><?php echo $langs->trans('Description'); ?></th>
                         <th class="right"><?php echo $langs->trans('Value'); ?></th>
                     </tr>
-                    <tr class="oddeven pgsz-optiontable-tr">
-                        <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_cc_create_services'); ?></td>               
-                        <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_cc_create_services_desc'); ?></td>
-                        <td class="right pgsz-optiontable-field "><input type="checkbox" name="products_cc" checked="checked"></td>
+                    <tr class="dolpgs-tbody">
+                        <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_cc_create_services'); ?></td>               
+                        <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_cc_create_services_desc'); ?></td>
+                        <td class="right"><input type="checkbox" name="products_cc" checked="checked"></td>
                     </tr>
-                    <tr class="oddeven pgsz-optiontable-tr">
-                        <td class="bold pgsz-optiontable-fieldname"><?php print $langs->trans('ffs_cc_create_cat'); ?></td>               
-                        <td class="pgsz-optiontable-fielddesc"><?php print $langs->trans('ffs_cc_create_cat_desc'); ?></td>
-                        <td class="right pgsz-optiontable-field ">
+                    <tr class="dolpgs-tbody">
+                        <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_cc_create_cat'); ?></td>               
+                        <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_cc_create_cat_desc'); ?></td>
+                        <td class="right">
                             <?php echo $form->selectarray('cats-ids',$cate_arbo,GETPOST('cats-ids'),0,0,0,'',0,0,0,'','minwidth200'); ?>      
                         </td>
                     </tr>
@@ -275,8 +275,8 @@ llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',array("/fastfactsupplier
                 </tbody>
             </table>
             <div class="right pgsz-buttons" style="padding:16px 0;">
-                <input type="button" class="button pgsz-button-cancel" value="<?php echo $langs->trans('ffs_cancel'); ?>" onclick="javascript:history.go(-1)">
-                <input type="submit" class="button pgsz-button-submit" name="" value="<?php echo $langs->trans('ffs_cc_button_insert'); ?>">
+                <input type="button" class="dolpgs-btn btn-danger btn-sm" value="<?php echo $langs->trans('ffs_cancel'); ?>" onclick="javascript:history.go(-1)">
+                <input type="submit" class="dolpgs-btn btn-primary btn-sm" name="" value="<?php echo $langs->trans('ffs_cc_button_insert'); ?>">
             </div>
         </form>
 
