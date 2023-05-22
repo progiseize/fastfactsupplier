@@ -67,7 +67,7 @@ class modFastFactSupplier extends DolibarrModules
         $this->editor_url = 'https://www.progiseize.fr';
         
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-        $this->version = '2.7.1';
+        $this->version = '2.7.2';
         $this->url_last_version = "https://progiseize.fr/modules_info/".get_class($this)."_lastversion.txt";
 
         // Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
@@ -98,7 +98,21 @@ class modFastFactSupplier extends DolibarrModules
         //                          'dir' => array('output' => 'othermodulename'),      // To force the default directories names
         //                          'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'! empty($conf->module1->enabled) && ! empty($conf->module2->enabled)', 'picto'=>'yourpicto@mymodule')) // Set here all workflow context managed by module
         //                        );
-        $this->module_parts = array();
+        $this->module_parts = array(
+            'triggers' => 0,
+            'login' => 0,
+            'substitutions' => 0,
+            'menus' => 0,
+            'theme' => 0,
+            'tpl' => 0,
+            'barcode' => 0, 
+            'models' => 0,
+            'css' => array(),
+            'js' => array(),
+            'hooks' => array(),
+            'dir' => array(),
+            'workflow' => array(),
+        );
 
         // Data directories to create when module is enabled.
         // Example: this->dirs = array("/mymodule/temp");

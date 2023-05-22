@@ -31,9 +31,6 @@ dol_include_once('./fastfactsupplier/lib/functions.lib.php');
 $version = explode('.', DOL_VERSION);
 if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
 
-// Change this following line to use the correct relative path from htdocs
-dol_include_once('/module/class/skeleton_class.class.php');
-
 // Protection if external user
 if ($user->societe_id > 0): accessforbidden(); endif;
 if(!$user->rights->fastfactsupplier->configurer): accessforbidden(); endif;
@@ -59,7 +56,7 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array(),array('
     <?php else : ?>
         <table class="centpercent notopnoleftnoright table-fiche-title"><tbody><tr class="titre"><td class="nobordernopadding widthpictotitle valignmiddle col-picto"><span class="fas fa-file-invoice-dollar valignmiddle widthpictotitle pictotitle" style=""></span></td><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><?php echo $langs->transnoentities('ffs_page_title'); ?></div></td></tr></tbody></table>
     <?php endif; ?>
-    <?php $head = ffsAdminPrepareHead(); dol_fiche_head($head, 'doc','FastFactSupplier', 0,'fa-file-invoice-dollar_file-invoice-dollar_fas'); ?>
+    <?php $head = ffsAdminPrepareHead(); echo dol_get_fiche_head($head, 'doc','FastFactSupplier', 0,'fa-file-invoice-dollar_fas_#fb2a52'); ?>
 
     <?php if(!in_array('progiseize', $conf->modules)): ?>
         <div class="alert-message-need-base">
