@@ -32,9 +32,6 @@ dol_include_once('./fastfactsupplier/lib/functions.lib.php');
 $version = explode('.', DOL_VERSION);
 if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
 
-// Change this following line to use the correct relative path from htdocs
-dol_include_once('/module/class/skeleton_class.class.php');
-
 // Load traductions files requiredby by page
 //$langs->load("companies");
 //$langs->load("other");

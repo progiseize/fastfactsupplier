@@ -31,9 +31,6 @@ dol_include_once('./fastfactsupplier/lib/functions.lib.php');
 $version = explode('.', DOL_VERSION);
 if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
 
-// Change this following line to use the correct relative path from htdocs
-dol_include_once('/module/class/skeleton_class.class.php');
-
 // Protection if external user
 if ($user->societe_id > 0): accessforbidden(); endif;
 if(!$user->rights->fastfactsupplier->configurer): accessforbidden(); endif;
