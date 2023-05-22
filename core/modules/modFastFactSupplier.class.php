@@ -109,7 +109,7 @@ class modFastFactSupplier extends DolibarrModules
             'models' => 0,
             'css' => array(),
             'js' => array(),
-            'hooks' => array()
+            'hooks' => array(),
             'dir' => array(),
             'workflow' => array(),
         );
