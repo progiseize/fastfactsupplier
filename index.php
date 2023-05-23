@@ -549,7 +549,16 @@ $date_limit = GETPOST("creafact-datelim"); if(empty($date_limit)): $date_limit =
 * VIEW
 ****************************************************/
 
-llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css"),'','fastfactsupplier saisie'); ?>
+$array_js = array(
+    '/fastfactsupplier/js/jquery-ui.min.js',
+    '/fastfactsupplier/js/fastfactsupplier.js'
+);
+$array_css = array(
+    '/fastfactsupplier/css/fastfactsupplier.css',
+    '/fastfactsupplier/css/dolpgs.css',
+);
+
+llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',$array_js,$array_css,'','fastfactsupplier saisie'); ?>
 
 <!-- CONTENEUR GENERAL -->
 <div class="dolpgs-main-wrapper fastfact">
@@ -585,7 +594,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
         <h3 class="dolpgs-table-title"><?php echo $langs->trans('ffs_infosgen'); ?></h3>
         <table class="dolpgs-table fastfact-table">
             <tbody>
-                <tr class="dolpgs-thead left">
+                <tr class="fastfact-thead dolpgs-thead left">
                     <th colspan="2"><?php echo $langs->trans('ffs_infosgen_tiers'); ?></th>
                 </tr>
                 <tr class="dolpgs-tbody">
@@ -601,7 +610,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
             </tbody>
             <tbody>
 
-                <tr class="dolpgs-thead left">
+                <tr class="fastfact-thead dolpgs-thead left">
                     <th colspan="2"><?php echo $langs->transnoentities('ffs_infosgen_facture'); ?> <span class="txt-numfact"></span></th>
                 </tr>
                 <tr class="dolpgs-tbody">
@@ -641,7 +650,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
             </tbody>
             <tbody>
 
-                <tr class="dolpgs-thead left">
+                <tr class="fastfact-thead dolpgs-thead left">
                     <th colspan="2"><?php echo $langs->trans('ffs_infosgen_actions'); ?></th>
                 </tr>
                 <tr class="dolpgs-tbody">
@@ -684,7 +693,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
 
                         <tbody>
 
-                            <tr class="dolpgs-thead left">
+                            <tr class="fastfact-thead dolpgs-thead left">
                                 <th colspan="2"><?php echo $langs->transnoentities('ffs_infosgen_customfields'); ?></th>
                             </tr>
 
@@ -736,7 +745,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
         <h3 class="dolpgs-table-title"><?php echo $langs->trans('ffs_details'); ?></h3>
         <table class="dolpgs-table fastfact-table" id="fastfact-tablelines">
             <tbody>
-                <tr class="dolpgs-thead noborderside ">
+                <tr class="fastfact-thead dolpgs-thead noborderside ">
                     <th><?php echo $langs->trans('ffs_details_prodserv'); ?> <span class="required">*</span></th>
                     <?php if($show_extrafields_factureline): // ON RECUPERE LES CHAMPS VISIBLES
                         $visible_extrafacture_ligne = array();
@@ -855,7 +864,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
             
             <tbody>                
                 <?php if($conf->global->MAIN_UPLOAD_DOC): ?>
-                <tr class="dolpgs-thead">
+                <tr class="fastfact-thead dolpgs-thead">
                     <th colspan="2"><?php print $langs->transnoentities('ffs_docs_uploadfile'); ?></th>
                 </tr>
                 <tr class="dolpgs-tbody nopadding fastfact-drop">
@@ -868,7 +877,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',array("/fastf
                     </td>
                 </tr>
                 <?php endif; ?>
-                <tr class="liste_titre dolpgs-thead">
+                <tr class="liste_titre fastfact-thead dolpgs-thead">
                     <th colspan="2"><?php print $langs->transnoentities('ffs_docs_link'); ?></th>
                 </tr>
                 <tr class="dolpgs-tbody">
