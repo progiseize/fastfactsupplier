@@ -169,7 +169,14 @@ endforeach;
 /***************************************************
 * VIEW
 ****************************************************/
-llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css"),'','fastfactsupplier'); ?>
+
+$array_js = array();
+$array_css = array(
+    '/fastfactsupplier/css/fastfactsupplier.css',
+    '/fastfactsupplier/css/dolpgs.css',
+);
+
+llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',$array_js,$array_css,'','fastfactsupplier'); ?>
 
 <div class="dolpgs-main-wrapper fastfact">
 

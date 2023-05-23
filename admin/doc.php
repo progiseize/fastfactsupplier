@@ -47,7 +47,13 @@ $action = GETPOST('action');
 /***************************************************
 * VIEW
 ****************************************************/
-llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',array(),array('/fastfactsupplier/css/fastfactsupplier.css'),'','fastfactsupplier doc'); ?>
+$array_js = array();
+$array_css = array(
+    '/fastfactsupplier/css/fastfactsupplier.css',
+    '/fastfactsupplier/css/dolpgs.css',
+);
+
+llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',$array_js,$array_css,'','fastfactsupplier doc'); ?>
 
 <div class="dolpgs-main-wrapper fastfact">
 
