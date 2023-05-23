@@ -207,8 +207,15 @@ endif;
 /*******************************************************************/
 // VUE
 /*******************************************************************/
+$array_js = array(
+    '/fastfactsupplier/js/fastfactsupplier.js',
+);
+$array_css = array(
+    '/fastfactsupplier/css/fastfactsupplier.css',
+    '/fastfactsupplier/css/dolpgs.css',
+);
 
-llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',array("/fastfactsupplier/js/jquery-ui.min.js","/fastfactsupplier/js/fastfactsupplier.js"),array("/fastfactsupplier/css/fastfactsupplier.css"),'','fastfactsupplier insert'); ?>
+llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',$array_js,$array_css,'','fastfactsupplier insert'); ?>
 
 <div class="dolpgs-main-wrapper fastfact">
 
