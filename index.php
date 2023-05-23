@@ -572,13 +572,6 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',$array_js,$ar
     <?php endif; ?>
     <?php $head = ffsAdminPrepareHead(); echo dol_get_fiche_head($head, 'saisir','FastFactSupplier', 0,'fa-file-invoice-dollar_fas_#fb2a52'); ?>
 
-    <?php if(!in_array('progiseize', $conf->modules)): ?>
-        <div class="alert-message-need-base">
-            <i class="fas fa-info-circle" style="margin-right:5px;"></i> 
-            Cette version nécéssite le module PROGISEIZE pour fonctionner correctement. Vous pouvez la télécharger depuis Github en cliquant sur ce lien : <a href="https://github.com/progiseize/progiseize" target="_blank">Module Progiseize Github</a>
-        </div>
-    <?php endif; ?>
-
     <?php if($user->rights->fastfactsupplier->saisir): ?>
     <form enctype="multipart/form-data" action="<?php print $_SERVER["PHP_SELF"]; ?>" method="POST">
 

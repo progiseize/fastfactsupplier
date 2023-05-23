@@ -76,7 +76,7 @@ class modFastFactSupplier extends DolibarrModules
         // If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
         // If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
         $version = explode('.',DOL_VERSION);
-        if($version[0] > 16): $this->picto='fa-file-invoice-dollar_file-invoice-dollar_fas_#263c5c';
+        if($version[0] > 16): $this->picto='fa-file-invoice-dollar_fas_#263c5c';
         else: $this->picto='technic';
         endif;
         // Defined all module parts (triggers, login, substitutions, menus, css, etc...)
