@@ -9,9 +9,11 @@
 [comment]: <> (3.0 -> Interopérabilité ScanInvoice)
 
 ***
-### 2.7.2 (03/03/2023)
+### 2.7.2 (23/05/2023)
 * FIX - Icone TABS
 * FIX - Valeur par défaut pour le descripteur du module (module_parts)
+* MAJ - Corrections Appel CSS - Progiseize Dolpgs intégré
+* FIX - Remove dropzone.min.css
 
 ### 2.7.1 (03/03/2023)
 * MAJ - CSS externalisé - Feuille de style commune module PROGISEIZE, nécéssite la version 1.4+
