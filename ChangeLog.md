@@ -9,6 +9,10 @@
 [comment]: <> (3.0 -> Interopérabilité ScanInvoice)
 
 ***
+### 2.7.3 (08/06/2023)
+* FIX - Corrections noms variables functions.lib.php
+* MAJ - Taille minimum champ libellé, ref et dates
+
 ### 2.7.2 (23/05/2023)
 * FIX - Icone TABS
 * FIX - Valeur par défaut pour le descripteur du module (module_parts)

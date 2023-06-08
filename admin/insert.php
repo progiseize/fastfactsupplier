@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 dol_include_once('./fastfactsupplier/lib/functions.lib.php');
 
 // Protection if external user
-if ($user->societe_id > 0): accessforbidden(); endif;
+if ($user->socid > 0): accessforbidden(); endif;
 if(!$user->rights->fastfactsupplier->configurer): accessforbidden(); endif;
 
 
@@ -226,13 +226,6 @@ llxHeader('',$langs->trans('ffs_cc_insert'),'','','','',$array_js,$array_css,'',
     <?php endif; ?>
     <?php $head = ffsAdminPrepareHead(); echo dol_get_fiche_head($head, 'insert','FastFactSupplier', 0,'fa-file-invoice-dollar_fas_#fb2a52'); ?>
 
-    <?php if(!in_array('progiseize', $conf->modules)): ?>
-        <div class="alert-message-need-base">
-            <i class="fas fa-info-circle" style="margin-right:5px;"></i> 
-            Cette version nécéssite le module PROGISEIZE pour fonctionner correctement. Vous pouvez la télécharger depuis Github en cliquant sur ce lien : <a href="https://github.com/progiseize/progiseize" target="_blank">Module Progiseize Github</a>
-        </div>
-    <?php endif; ?>
-    
     <?php if($langs->shortlang == 'fr'): ?>
 
         <form enctype="multipart/form-data" action="<?php print $_SERVER["PHP_SELF"]; ?>" method="post" id="">

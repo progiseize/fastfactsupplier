@@ -27,7 +27,7 @@ if (! $res && file_exists("../main.inc.php")): $res=@include '../main.inc.php'; 
 if (! $res && file_exists("../../main.inc.php")): $res=@include '../../main.inc.php'; endif;
 
 // Protection if external user
-if($user->societe_id > 0): accessforbidden(); endif;
+if ($user->socid > 0): accessforbidden(); endif;
 if(!$user->rights->fastfactsupplier->saisir): accessforbidden(); endif;
 
 /*******************************************************************
@@ -62,10 +62,11 @@ dol_include_once('./fastfactsupplier/lib/functions.lib.php');
 $use_server_list = $conf->global->SRFF_USESERVERLIST;
 $cats_to_use = json_decode($conf->global->SRFF_CATS);
 $prodservs = explode(',',$conf->global->SRFF_SERVERLIST);
-$gotoreg = $conf->global->SRFF_GOTOREG;
-$show_extrafields_facture = $conf->global->SRFF_SHOWEXTRAFACT;
-$show_extrafields_factureline = $conf->global->SRFF_SHOWEXTRAFACTLINE;
-$usecustomfield_uploadfile = $conf->global->SRFF_USECUSTOMFIELD_UPLOADFILE;
+
+$gotoreg = isset($conf->global->SRFF_GOTOREG)?$conf->global->SRFF_GOTOREG:0;
+$show_extrafields_facture = isset($conf->global->SRFF_SHOWEXTRAFACT)?$conf->global->SRFF_SHOWEXTRAFACT:0;
+$show_extrafields_factureline = isset($conf->global->SRFF_SHOWEXTRAFACTLINE)?$conf->global->SRFF_SHOWEXTRAFACTLINE:0;
+$usecustomfield_uploadfile = isset($conf->global->SRFF_USECUSTOMFIELD_UPLOADFILE)?$conf->global->SRFF_USECUSTOMFIELD_UPLOADFILE:0;
 
 /*******************************************************************
 * VARIABLES
@@ -610,26 +611,26 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',$array_js,$ar
                     <td class="dolpgs-font-medium"><?php echo $langs->transnoentities('ffs_infosgen_facture_libelle'); ?></td>
                     <td class="right">
                         <?php $post_libelle = GETPOST('creafact-libelle','alpha'); ?>
-                        <input type="text" name="creafact-libelle" id="creafact-libelle" value="<?php if (!empty($post_libelle)): echo $post_libelle; endif; ?>" />
+                        <input type="text" name="creafact-libelle" class="minwidth300" id="creafact-libelle" value="<?php if (!empty($post_libelle)): echo $post_libelle; endif; ?>" />
                     </td>
                 </tr>
                 <tr class="dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_infosgen_facture_ref'); ?> <span class="required">*</span></td>
                     <td class="right">
                         <?php $post_reffourn = GETPOST('creafact-reffourn','alpha'); ?>
-                        <input type="text" data-checkrefurl="<?php echo $new_script_file.'scripts/verif_reffourn.php'; ?>" name="creafact-reffourn" id="creafact-reffourn" class="<?php echo is_fielderror('creafact-reffourn',$input_errors); ?>" value="<?php if (!empty($post_reffourn)): echo $post_reffourn; endif; ?>"  />
+                        <input type="text" data-checkrefurl="<?php echo $new_script_file.'scripts/verif_reffourn.php'; ?>" name="creafact-reffourn" id="creafact-reffourn" class="minwidth300 <?php echo is_fielderror('creafact-reffourn',$input_errors); ?>" value="<?php if (!empty($post_reffourn)): echo $post_reffourn; endif; ?>"  />
                     </td>
                 </tr>
                 <tr class="dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_infosgen_facture_date'); ?> <span class="required">*</span></td>
                     <td class="right">
-                        <input type="text" name="creafact-datefact" id="creafact-datefact" value="<?php echo $date_facturation; ?>" class="datepick <?php echo is_fielderror('creafact-datefact',$input_errors); ?>" />
+                        <input type="text" name="creafact-datefact" id="creafact-datefact" value="<?php echo $date_facturation; ?>" class="datepick minwidth200 <?php echo is_fielderror('creafact-datefact',$input_errors); ?>" />
                     </td>
                 </tr>
                 <tr class="dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php print $langs->transnoentities('ffs_infosgen_facture_datelim'); ?> <span class="required">*</span></td>
                     <td class="right">
-                        <input type="text" name="creafact-datelim" id="creafact-datelim" value="<?php echo $date_limit; ?>" class="datepick <?php echo is_fielderror('creafact-datelim',$input_errors); ?>" />
+                        <input type="text" name="creafact-datelim" id="creafact-datelim" value="<?php echo $date_limit; ?>" class="datepick minwidth200 <?php echo is_fielderror('creafact-datelim',$input_errors); ?>" />
                     </td>
                 </tr>
                 <?php if($conf->global->SRFF_BANKACCOUNT != '-1'): ?>
@@ -746,7 +747,8 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',$array_js,$ar
                             if(in_array($extrafields->attributes['facture_fourn_det']['list'][$key_exfl], $extraf_visibletab) && $extrafields->attributes['facture_fourn_det']['enabled'][$key_exfl]):
                                 $visible_extrafacture_ligne[$key_exfl] = $extralabels_factureligne[$key_exfl]; ?>
                                 <th class="left">
-                                    <?php echo $extrafields->attribute_label[$key_exfl]; if($extrafields->attribute_required[$key_exfl] == 1): ?><span class="required">*</span><?php endif; ?>
+                                    <?php echo $extrafields->attributes['facture_fourn_det']['label'][$key_exfl]; 
+                                    if($extrafields->attributes['facture_fourn_det']['required'][$key_exfl] == 1): ?><span class="required">*</span><?php endif; ?>
                                 </th>
                             <?php endif;
                         endforeach;
@@ -839,7 +841,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',$array_js,$ar
                 <tr class="dolpgs-tbody nopadding withoutborder">
                     <td valign="top">
                         <input type="button" value="<?php echo $langs->transnoentities('ffs_details_addline'); ?>" id="add-facture-line" class="dolpgs-btn btn-primary btn-sm" data-addurl="<?php echo $new_script_file.'scripts/add_line.php'; ?>" />
-                        <?php if($facture_lines && count($facture_lines) > 1): $display = 'inline-block'; else: $display = 'none'; endif; ?>
+                        <?php if(isset($facture_lines) && count($facture_lines) > 1): $display = 'inline-block'; else: $display = 'none'; endif; ?>
                         <input type="button" value="<?php echo $langs->transnoentities('ffs_details_delline'); ?>" id="del-facture-line" style="display:<?php echo $display; ?>;" class="dolpgs-btn btn-danger btn-sm" />
                     </td>
                     <td valign="top" class="right">
