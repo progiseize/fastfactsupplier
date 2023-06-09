@@ -37,7 +37,7 @@ if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
 //$langs->load("other");
 
 // Protection if external user
-if ($user->societe_id > 0): accessforbidden(); endif;
+if ($user->socid > 0): accessforbidden(); endif;
 if(!$user->rights->fastfactsupplier->configurer): accessforbidden(); endif;
 
 /*******************************************************************
@@ -186,13 +186,6 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',$array_js,$arra
         <table class="centpercent notopnoleftnoright table-fiche-title"><tbody><tr class="titre"><td class="nobordernopadding widthpictotitle valignmiddle col-picto"><span class="fas fa-file-invoice-dollar valignmiddle widthpictotitle pictotitle" style=""></span></td><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><?php echo $langs->transnoentities('ffs_page_title'); ?></div></td></tr></tbody></table>
     <?php endif; ?>
     <?php $head = ffsAdminPrepareHead(); echo dol_get_fiche_head($head, 'setup','FastFactSupplier', 0,'fa-file-invoice-dollar_fas_#fb2a52'); ?>
-
-    <?php if(!in_array('progiseize', $conf->modules)): ?>
-        <div class="alert-message-need-base">
-            <i class="fas fa-info-circle" style="margin-right:5px;"></i> 
-            Cette version nécéssite le module PROGISEIZE pour fonctionner correctement. Vous pouvez la télécharger depuis Github en cliquant sur ce lien : <a href="https://github.com/progiseize/progiseize" target="_blank">Module Progiseize Github</a>
-        </div>
-    <?php endif; ?>
     
     <form enctype="multipart/form-data" action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="POST" id="">
 

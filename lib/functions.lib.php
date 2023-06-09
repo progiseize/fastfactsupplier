@@ -57,7 +57,7 @@ function ffsAdminPrepareHead()
         $h++;
     endif;
 
-    complete_head_from_modules($conf, $langs, $object, $head, $h, 'fastfactsupplier');
+    complete_head_from_modules($conf, $langs, 'null', $head, $h, 'fastfactsupplier');
 
     return $head;
 }
@@ -130,8 +130,8 @@ function ffs_getListProdServ($tab_cats){
     $sql .=" ORDER BY label";
     $results_prodserv = $db->query($sql);
 
-    if($results_prodserv): $count_prods = $db->num_rows($result_prods); $i = 0;
-        while ($i < $count_prods): $prodserv = $db->fetch_object($result_prods);
+    if($results_prodserv): $count_prods = $db->num_rows($results_prodserv); $i = 0;
+        while ($i < $count_prods): $prodserv = $db->fetch_object($results_prodserv);
             if($prodserv): $tab_prodserv[$prodserv->rowid] = $prodserv->label; endif;
             $i++;
         endwhile;
