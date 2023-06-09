@@ -5,5 +5,5 @@ Intégration rapide de tous vos achats (matières premières) et de vos frais g�
 Ce module optimise l'utilisation de Dolibarr (tableaux de bords, trésorerie…).
 **Compatible multi-société**
 
-**Depuis la version 2.7.1, le module nécessite le module Progiseize 1.4+.** 
-Vous pouvez le télécharger depuis [GitHub ](https://github.com/progiseize/progiseize)
+Module Progiseize: (non obligatoire)
+https://github.com/progiseize/progiseize
