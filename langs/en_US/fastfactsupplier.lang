@@ -114,3 +114,5 @@ ffs_doc_options_cats_desc=2 different modes:<ul><li>Use of an existing category:
 ffs_doc_extra_uploadfile="Attached file" custom field
 ffs_doc_extra_uploadfile_desc=This option creates a boolean extrafield (Yes/No) which will be filled in automatically if a document has been added to the invoice (upload or linked file).
 ffs_doc_options_customfields_desc=Only extrafields with visibility 1 or 3 will be displayed. This feature does not support checking for unique fields and using them may cause inability to create vendor invoices from within the module.<br>(Support enhancements are planned for future releases).
+ffs_fielderror_mustbeunique=Field '%s' must be unique
+ffs_fielderror_emailnotvalid=Email address '%s' seems invalid

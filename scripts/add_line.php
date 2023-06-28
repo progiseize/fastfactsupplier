@@ -22,51 +22,28 @@ $res=0;
 if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.php';
 if (! $res && file_exists("../../../main.inc.php")) $res=@include '../../../main.inc.php';
 
-
-/*******************************************************************
-* FONCTIONS
-********************************************************************/
-dol_include_once('./fastfactsupplier/lib/functions.lib.php');
-
 // Protection if external user
 if ($user->societe_id > 0): accessforbidden(); endif;
 
-// Configuration module
-$use_server_list = $conf->global->SRFF_USESERVERLIST;
-$ncats = json_decode($conf->global->SRFF_CATS);
-$prodservs = explode(',',$conf->global->SRFF_SERVERLIST);
-$gotoreg = $conf->global->SRFF_GOTOREG;
-$show_extrafields_facture = $conf->global->SRFF_SHOWEXTRAFACT;
-$show_extrafields_factureline = $conf->global->SRFF_SHOWEXTRAFACTLINE;
+dol_include_once('./fastfactsupplier/class/fastfactsupplier.class.php');
+dol_include_once('./fastfactsupplier/lib/functions.lib.php');
+
+include_once('../lib/functions.lib.php');
+
+/*******************************************************************
+* VARIABLES
+********************************************************************/
+$fastfactsupplier = new FastFactSupplier($db);
+
+// POUR <= V10, ON INSTANCIE LES EXTRAFIELDS
+$version = explode('.', DOL_VERSION);
+if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
 
 $form = new Form($db);
 
 // On recupère la liste des services
-if($use_server_list):
-
-    $tab_prodserv = array();
-
-    $sql = "SELECT rowid, label, tva_tx FROM ".MAIN_DB_PREFIX."product as a";
-    $sql .=" INNER JOIN ".MAIN_DB_PREFIX."categorie_product as b";
-    $sql .=" ON a.rowid = b.fk_product WHERE";
-
-    $nbcats = 0;
-    foreach($ncats as $cc): $nbcats++;
-        if($nbcats > 1): $sql .= " OR"; endif;
-        $sql .=" b.fk_categorie = '".$cc."'";
-    endforeach;
-    
-    $sql .=" ORDER BY label";
-    $results_prodserv = $db->query($sql);
-
-    if($results_prodserv): $count_prods = $db->num_rows($result_prods); $i = 0;
-        while ($i < $count_prods): $prodserv = $db->fetch_object($result_prods);
-            if($prodserv): $tab_prodserv[$prodserv->rowid] = $prodserv->label; endif;
-            $i++;
-        endwhile;
-    endif;
-else : $tab_prodserv = $prodservs;
-endif;
+if($fastfactsupplier->params['use_categories_product']): $tab_prodserv = $fastfactsupplier->get_products_services_list($fastfactsupplier->params['cats_to_use']);
+else : $tab_prodserv = explode(',',getDolGlobalString('SRFF_SERVERLIST')); endif;
 
 // On recupere les taux de TVA
 $form->load_cache_vatrates("'".$mysoc->country_code."'");
@@ -75,41 +52,72 @@ foreach($form->cache_vatrates as $vat):
     $vat_rates[$vat['txtva']] = $vat['label'];
 endforeach;
 
-// Variables
-$input_errors = array();
+// Extrafields line
+if($fastfactsupplier->params['show_extrafields_factureline']): $extralabels_factureligne = $extrafields->fetch_name_optionals_label('facture_fourn_det'); endif; // LIGNES FACTURE
+$extrafields_view_tab = array('1','3'); 
+$invoice_extrafields_line = array();
+if($fastfactsupplier->params['show_extrafields_factureline'] && !empty($extralabels_factureligne)):
+    foreach($extralabels_factureligne as $key_extrafield => $label_extrafield):
 
-// POUR <= V10, ON INSTANCIE LES EXTRAFIELDS
-$version = explode('.', DOL_VERSION);
-if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
+        // On check l'entité
+        if(!in_array($extrafields->attributes['facture_fourn_det']['entityid'][$key_extrafield], array(0,$conf->entity))): continue; endif;
 
-if($show_extrafields_factureline): $extralabels_factureligne = $extrafields->fetch_name_optionals_label('facture_fourn_det'); endif; // LIGNES FACTURE
-$extraf_visibletab = array('1','3'); 
+        // On check s'il est activé 
+        if(!$extrafields->attributes['facture_fourn_det']['enabled'][$key_extrafield]): continue; endif;
+        if(!empty($extrafields->attributes['facture_fourn_det']['enabled'][$key_extrafield])):
+            if(!dol_eval($extrafields->attributes['facture_fourn_det']['enabled'][$key_extrafield], 1,0)): continue; endif;
+        endif;
+
+        // On check si il est visible
+        if(!in_array($extrafields->attributes['facture_fourn_det']['list'][$key_extrafield], $extrafields_view_tab)): continue; endif;
+
+        // On check les perms
+        if(!$extrafields->attributes['facture_fourn_det']['perms'][$key_extrafield]): continue; endif;
+
+        // Lang File
+        if(!empty($extrafields->attributes['facture_fourn_det']['langfile'][$key_extrafield])):
+            $langs->load($extrafields->attributes['facture_fourn_det']['langfile'][$key_extrafield]);
+            $extralabels_factureligne[$key_extrafield] = $langs->transnoentities($label_extrafield);
+            $extrafields->attributes['facture_fourn_det']['label'][$key_extrafield] = $langs->transnoentities($label_extrafield);
+        endif;
+
+        // On l'ajoute au tableau
+        array_push($invoice_extrafields_line, $key_extrafield);
+
+    endforeach;    
+endif;
 /***************************************************************************/
 
-include_once('../lib/functions.lib.php'); ?>
+?>
 
 <tr id="linefact-<?php echo GETPOST('viewnumber') ?>" class="dolpgs-tbody linefact">
     <td class="">
         <input type="hidden" name="infofact-saisie-<?php echo GETPOST('viewnumber'); ?>" id="infofact-saisie-<?php echo GETPOST('viewnumber'); ?>" value="" >
-        <?php echo ffs_select_prodserv($tab_prodserv,GETPOST('viewnumber'),'',$input_errors); ?>
+        <?php echo $fastfactsupplier->select_prodserv($tab_prodserv,GETPOST('viewnumber'),''); ?>
     </td>
-    <?php if($show_extrafields_factureline && !empty($extralabels_factureligne)):  ?>
-        <?php foreach($extralabels_factureligne as $key => $label): 
-            if(in_array($extrafields->attributes['facture_fourn_det']['list'][$key], $extraf_visibletab) && $extrafields->attributes['facture_fourn_det']['enabled'][$key]): ?>
-            <td class="left">
-                <?php 
-                    $class_field = 'ffs-cfligne minwidth200';
-                    if($key == $conf->global->SRFF_EXTRAFACTLINE_PROJECT): $class_field .= ' ffs-lineproject'; endif;
-                    if(in_array($extrafields->attribute_type[$key], array('select','sellist'))): $class_field .= ' ffs-slct'; endif;
+    <?php 
+
+        if($fastfactsupplier->params['show_extrafields_factureline'] && !empty($invoice_extrafields_line)):
+            foreach($invoice_extrafields_line as $key_extrafield):
+
+                $value_extrafield = $line['extrafields'][$key_extrafield];
+                $type_extrafield = $extrafields->attributes['facture_fourn_det']['type'][$key_extrafield];
+
+                $class_extrafield = 'ffs-cfligne minwidth200'; 
+                if($key_extrafield == $fastfactsupplier->params['extra_lineproject']): $class_extrafield .= ' ffs-lineproject'; endif;
+                if(in_array($type_extrafield, array('select','sellist'))): $class_extrafield .= ' ffs-slct'; endif;
+               
                 ?>
-                <?php echo $extrafields->showInputField($key,$value_extrafield,'','-'.GETPOST('viewnumber'),'',$class_field,$facture->id,'facture_fourn_det'); ?>
-            </td>
-        <?php endif; endforeach; ?>
-    <?php endif; ?>
-    <td class="<?php if($conf->global->SRFF_AMOUNT_MODE == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ht" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td>
-    <td class="<?php if($conf->global->SRFF_AMOUNT_MODE == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ttc" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td> 
+                <td class="left pgsz-optiontable-field">
+                    <?php echo $extrafields->showInputField($key_extrafield,$value_extrafield,'','-'.GETPOST('viewnumber'),'',trim($class_extrafield),'','facture_fourn_det'); ?>
+                </td>
+
+            <?php endforeach;
+        endif;  ?>
+    <td class="<?php if($fastfactsupplier->params['mode_amount'] == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ht" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td>
+    <td class="<?php if($fastfactsupplier->params['mode_amount'] == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ttc" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td> 
     <td class="right">
-        <?php if(!empty($vat_rates)): echo $form->selectarray('infofact-tva-'.GETPOST('viewnumber'),$vat_rates,$conf->global->SRFF_DEFAULT_TVA,0,0,0,'data-linenum="'.GETPOST('viewnumber').'"',0,0,0,'','minwidth100 calc-tva');
+        <?php if(!empty($vat_rates)): echo $form->selectarray('infofact-tva-'.GETPOST('viewnumber'),$vat_rates,$fastfactsupplier->params['default_tva'],0,0,0,'data-linenum="'.GETPOST('viewnumber').'"',0,0,0,'','minwidth100 calc-tva');
         else: echo $langs->transnoentities('ffs_noVAT');
         endif; ?>
     </td>

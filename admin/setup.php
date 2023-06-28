@@ -22,68 +22,62 @@ if (! $res && file_exists("../main.inc.php")): $res=@include '../main.inc.php'; 
 if (! $res && file_exists("../../main.inc.php")): $res=@include '../../main.inc.php'; endif;
 if (! $res && file_exists("../../../main.inc.php")): $res=@include '../../../main.inc.php'; endif;
 
-require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-
-dol_include_once('./fastfactsupplier/lib/functions.lib.php');
-
-// POUR <= V10, ON INSTANCIE LES EXTRAFIELDS
-$version = explode('.', DOL_VERSION);
-if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
-
-// Load traductions files requiredby by page
-//$langs->load("companies");
-//$langs->load("other");
-
 // Protection if external user
 if ($user->socid > 0): accessforbidden(); endif;
 if(!$user->rights->fastfactsupplier->configurer): accessforbidden(); endif;
+
+require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formsetup.class.php';
+require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+
+dol_include_once('./fastfactsupplier/class/fastfactsupplier.class.php');
+dol_include_once('./fastfactsupplier/lib/functions.lib.php');
+
+// ON INSTANCIE LES EXTRAFIELDS SI BESOIN
+if(!isset($extrafields)): $extrafields = new ExtraFields($db); endif;
+
+
 
 /*******************************************************************
 * VARIABLES
 ********************************************************************/
 $action = GETPOST('action');
-$plugin_url = DOL_MAIN_URL_ROOT.'/custom/fastfactsupplier/'; 
 
+$form = new Form($db);
+$fastfactsupplier = new FastFactSupplier($db);
+
+// EXTRAFIELDS
+$extralabels_facture = $extrafields->fetch_name_optionals_label('facture_fourn');
 $extralabels_factureligne = $extrafields->fetch_name_optionals_label('facture_fourn_det');
 
+// ON RECUPERE LES CATEGORIES PRODUITS
+$cate_arbo = $form->select_all_categories(Categorie::TYPE_PRODUCT, '', 'parent', 64, 0, 1);
+$cats = $fastfactsupplier->params['cats_to_use'];
+$arrayselected=array();
+if(!empty($cats)): foreach($cats as $cat): $arrayselected[] = $cat; endforeach; endif;
 
-$sql_checkconst = "SELECT rowid FROM ".MAIN_DB_PREFIX."const";
-$sql_checkconst .= " WHERE name IN (";
-$sql_checkconst .= " 'MAIN_MODULE_FASTFACTSUPPLIER_JS','MAIN_MODULE_FASTFACTSUPPLIER_CSS','MAIN_MODULE_FASTFACTSUPPLIER_HOOKS'";
-$sql_checkconst .= ")";
-
-$result_checkconst = $db->query($sql_checkconst);
-
-if($result_checkconst):
-    if($result_checkconst->num_rows > 0):
-        while($const_todel = $db->fetch_object($result_checkconst)):
-            $sql_delconst = "DELETE FROM ".MAIN_DB_PREFIX."const";
-            $sql_delconst .= " WHERE rowid = ".$const_todel->rowid;
-            $result_delconst = $db->query($sql_delconst); 
-        endwhile;
-    endif;
-endif;
-
+// ON RECUPERE LES TAUX DE TVA
+$form->load_cache_vatrates("'".$mysoc->country_code."'");
+$vat_rates = array();
+foreach($form->cache_vatrates as $vat):
+    $vat_rates[$vat['txtva']] = $vat['label'];
+endforeach;
 
 /*******************************************************************
 * ACTIONS
 ********************************************************************/
 if ($action == 'setOptions' && GETPOST('token') == $_SESSION['token']):
 
-    $cats = json_encode(GETPOST('srff-cats'));
-    $useServer = GETPOST('srff-useserver');
-    $serverList = GETPOST('srff-serverlist');
-    $gotoreg = GETPOST('srff-gotoreg');
-    $use_customfield_uploadfile = GETPOST('srff-usecustomfield-uploadfile');
-    $defTva = GETPOST('srff-default-tva');
-    $bkAccount = GETPOST('srff-bank-account');
-    $modeAMount = GETPOST('srff-amount-mode');
-    $showExtraFields_fact = GETPOST('srff-showextrafact');
-    $showExtraFields_factline = GETPOST('srff-showextrafactline');
-
-    $cf_labels = $extrafields->fetch_name_optionals_label('facture_fourn');        
+    $cats = json_encode(GETPOST('srff-cats','alphanohtml'));
+    $useServer = GETPOST('srff-useserver','alphanohtml');
+    $serverList = GETPOST('srff-serverlist','alphanohtml');
+    $gotoreg = GETPOST('srff-gotoreg','alphanohtml');
+    $use_customfield_uploadfile = GETPOST('srff-usecustomfield-uploadfile','alphanohtml');
+    $defTva = GETPOST('srff-default-tva','int');
+    $bkAccount = GETPOST('srff-bank-account','int');
+    $modeAMount = GETPOST('srff-amount-mode','alphanohtml');
+    $showExtraFields_fact = GETPOST('srff-showextrafact','alphanohtml');
+    $showExtraFields_factline = GETPOST('srff-showextrafactline','alphanohtml');            
 
     $errs = 0;
 
@@ -95,11 +89,11 @@ if ($action == 'setOptions' && GETPOST('token') == $_SESSION['token']):
     // Si l'option en cochée
     if($use_customfield_uploadfile && $use_customfield_uploadfile == 'oui'): 
         dolibarr_set_const($db, "SRFF_USECUSTOMFIELD_UPLOADFILE",true,'chaine',0,'',$conf->entity);
-        if(!array_key_exists('ffs_uploadfile', $cf_labels)): $extrafields->addExtraField('ffs_uploadfile',$langs->trans('ffs_options_params_use_extrauploadfilename'),'boolean','50','','facture_fourn',0,0,'0','',1,'','2'); endif;
+        if(!array_key_exists('ffs_uploadfile', $extralabels_facture)): $extrafields->addExtraField('ffs_uploadfile',$langs->trans('ffs_options_params_use_extrauploadfilename'),'boolean','50','','facture_fourn',0,0,'0','',1,'','2'); endif;
         
     else: 
         dolibarr_set_const($db, "SRFF_USECUSTOMFIELD_UPLOADFILE",false,'chaine',0,'',$conf->entity);
-        if(array_key_exists('ffs_uploadfile', $cf_labels)): $extrafields->delete('ffs_uploadfile','facture_fourn'); endif;
+        if(array_key_exists('ffs_uploadfile', $extralabels_facture)): $extrafields->delete('ffs_uploadfile','facture_fourn'); endif;
     endif;
 
     // Si l'option en cochée
@@ -149,22 +143,8 @@ if ($action == 'setOptions' && GETPOST('token') == $_SESSION['token']):
 
 endif;
 
-
-$form = new Form($db);
-
-// ON RECUPERE LES CATEGORIES PRODUITS
-$cate_arbo = $form->select_all_categories(Categorie::TYPE_PRODUCT, '', 'parent', 64, 0, 1);
-$cats = json_decode($conf->global->SRFF_CATS);
-$arrayselected=array();
-if(!empty($cats)): foreach($cats as $cat): $arrayselected[] = $cat; endforeach; endif;
-
-// ON RECUPERE LES TAUX DE TVA
-$form->load_cache_vatrates("'".$mysoc->country_code."'");
-$vat_rates = array();
-foreach($form->cache_vatrates as $vat):
-    $vat_rates[$vat['txtva']] = $vat['label'];
-endforeach;
-
+// On recharge les valeurs
+$fastfactsupplier->refresh_params();
 
 /***************************************************
 * VIEW
@@ -186,6 +166,8 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',$array_js,$arra
         <table class="centpercent notopnoleftnoright table-fiche-title"><tbody><tr class="titre"><td class="nobordernopadding widthpictotitle valignmiddle col-picto"><span class="fas fa-file-invoice-dollar valignmiddle widthpictotitle pictotitle" style=""></span></td><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><?php echo $langs->transnoentities('ffs_page_title'); ?></div></td></tr></tbody></table>
     <?php endif; ?>
     <?php $head = ffsAdminPrepareHead(); echo dol_get_fiche_head($head, 'setup','FastFactSupplier', 0,'fa-file-invoice-dollar_fas_#fb2a52'); ?>
+
+    
     
     <form enctype="multipart/form-data" action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="POST" id="">
 
@@ -200,18 +182,18 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',$array_js,$arra
                 </tr>
                 <tr class="dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_cats_usedolicats'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_cats_usedolicats_desc'); ?></td>
-                    <td class="right"><input type="checkbox" name="srff-useserver" id="srff-useserver" value="oui" <?php if($conf->global->SRFF_USESERVERLIST): ?>checked="checked"<?php endif; ?> /></td>
+                    <td class="hideonsmartphone"><?php echo $langs->trans('ffs_options_cats_usedolicats_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-useserver" id="srff-useserver" value="oui" <?php if($fastfactsupplier->params['use_categories_product']): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
                 <tr class="dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_cats_usedolicats_ids'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_cats_usedolicats_ids_desc'); ?></td>
+                    <td class="hideonsmartphone"><?php echo $langs->trans('ffs_options_cats_usedolicats_ids_desc'); ?></td>
                     <td class="right"><?php print $form->multiselectarray('srff-cats', $cate_arbo, $arrayselected, '', 0, '', 0, '100%'); ?></td>
                 </tr>
                 <tr class="dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_cats_predefined'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_cats_predefined_desc'); ?></td>
-                    <td class="right"><input type="text" name="srff-serverlist" id="srff-serverlist" style="width: 100%;" value="<?php if($conf->global->SRFF_SERVERLIST): echo $conf->global->SRFF_SERVERLIST; endif; ?>"></td>
+                    <td class="hideonsmartphone"><?php print $langs->trans('ffs_options_cats_predefined_desc'); ?></td>
+                    <td class="right"><input type="text" name="srff-serverlist" id="srff-serverlist" style="width: 100%;" value="<?php echo $fastfactsupplier->params['custom_list']; ?>"></td>
                 </tr>
             </tbody>
             <tbody>                
@@ -220,33 +202,33 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',$array_js,$arra
                 </tr>
                 <tr class="dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_params_amountmode'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_params_amountmode_desc'); ?></td>
+                    <td class="hideonsmartphone"><?php print $langs->trans('ffs_options_params_amountmode_desc'); ?></td>
                     <td class="right">
-                        <?php echo $form->selectarray('srff-amount-mode',array('ht' => 'HT','ttc' => 'TTC','both'=>'HT & TTC'),$conf->global->SRFF_AMOUNT_MODE,0,0,0,'',0,0,0,'','opt-slct minwidth100'); ?>
+                        <?php echo $form->selectarray('srff-amount-mode',array('ht' => 'HT','ttc' => 'TTC','both'=>'HT & TTC'),$fastfactsupplier->params['mode_amount'],0,0,0,'',0,0,0,'','opt-slct minwidth200'); ?>
                     </td>
                 </tr>
                 <tr class="oddeven dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_params_defaulttax'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_params_defaulttax_desc'); ?></td>
+                    <td class="hideonsmartphone"><?php print $langs->trans('ffs_options_params_defaulttax_desc'); ?></td>
                     <td class="right">
                         <?php // echo $form->load_tva('srff-default-tva',$conf->global->SRFF_DEFAULT_TVA); ?>
-                        <?php echo $form->selectarray('srff-default-tva',$vat_rates,$conf->global->SRFF_DEFAULT_TVA,0,0,0,'',0,0,0,'','minwidth100'); ?>
+                        <?php echo $form->selectarray('srff-default-tva',$vat_rates,$fastfactsupplier->params['default_tva'],0,0,0,'',0,0,0,'','minwidth200'); ?>
                     </td>
                 </tr>
                 <tr class="oddeven dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_params_bankaccount'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_params_bankaccount_desc'); ?></td>
-                    <td class="right"><?php $form->select_comptes($conf->global->SRFF_BANKACCOUNT,'srff-bank-account',0,'',1); ?></td>
+                    <td class="hideonsmartphone"><?php echo $langs->trans('ffs_options_params_bankaccount_desc'); ?></td>
+                    <td class="right"><?php $form->select_comptes($fastfactsupplier->params['default_bankaccount'],'srff-bank-account',0,'',1,'',0,'minwidth200'); ?></td>
                 </tr>
                 <tr class="oddeven dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_params_gotoreg'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_params_gotoreg_desc'); ?></td>
-                    <td class="right"><input type="checkbox" name="srff-gotoreg" id="srff-gotoreg" value="oui" <?php if($conf->global->SRFF_GOTOREG): ?>checked="checked"<?php endif; ?> /></td>
+                    <td class="hideonsmartphone"><?php echo $langs->trans('ffs_options_params_gotoreg_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-gotoreg" id="srff-gotoreg" value="oui" <?php if($fastfactsupplier->params['gotoreg']): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
                 <tr class="oddeven dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_params_use_extrauploadfile'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_params_use_extrauploadfile_desc'); ?></td>
-                    <td class="right"><input type="checkbox" name="srff-usecustomfield-uploadfile" id="srff-usecustomfield-uploadfile" value="oui" <?php if($conf->global->SRFF_USECUSTOMFIELD_UPLOADFILE): ?>checked="checked"<?php endif; ?> /></td>
+                    <td class="hideonsmartphone"><?php echo $langs->trans('ffs_options_params_use_extrauploadfile_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-usecustomfield-uploadfile" id="srff-usecustomfield-uploadfile" value="oui" <?php if($fastfactsupplier->params['usecustomfield_uploadfile']): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
             </tbody>
             <tbody>
@@ -256,21 +238,21 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',$array_js,$arra
                 
                 <tr class="oddeven dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_customfields_invoice'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_customfields_desc'); ?></td>
-                    <td class="right"><input type="checkbox" name="srff-showextrafact" id="srff-showextrafact" value="oui" <?php if($conf->global->SRFF_SHOWEXTRAFACT): ?>checked="checked"<?php endif; ?> /></td>
+                    <td class="hideonsmartphone"><?php print $langs->trans('ffs_options_customfields_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-showextrafact" id="srff-showextrafact" value="oui" <?php if($fastfactsupplier->params['show_extrafields_facture']): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
                 <tr class="oddeven dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php print $langs->trans('ffs_options_customfields_invoiceline'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php print $langs->trans('ffs_options_customfields_desc'); ?></td>
-                    <td class="right"><input type="checkbox" name="srff-showextrafactline" id="srff-showextrafactline" value="oui" <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE): ?>checked="checked"<?php endif; ?> /></td>
+                    <td class="hideonsmartphone"><?php print $langs->trans('ffs_options_customfields_desc'); ?></td>
+                    <td class="right"><input type="checkbox" name="srff-showextrafactline" id="srff-showextrafactline" value="oui" <?php if($fastfactsupplier->params['show_extrafields_factureline']): ?>checked="checked"<?php endif; ?> /></td>
                 </tr>
 
-                <?php if($conf->global->SRFF_SHOWEXTRAFACTLINE && !empty($extralabels_factureligne)): ?>
+                <?php if($fastfactsupplier->params['show_extrafields_factureline'] && !empty($extralabels_factureligne)): ?>
                 <tr class="oddeven dolpgs-tbody">
                     <td class="dolpgs-font-medium"><?php echo $langs->trans('ffs_options_params_linkprojectslines'); ?></td>               
-                    <td class="dolpgs-color-gray-i"><?php echo $langs->trans('ffs_options_params_linkprojectslines_desc'); ?></td>
+                    <td class="hideonsmartphone"><?php echo $langs->trans('ffs_options_params_linkprojectslines_desc'); ?></td>
                     <td class="right">
-                        <?php echo $form->selectarray('srff-lineprojectfield',$extralabels_factureligne,$conf->global->SRFF_EXTRAFACTLINE_PROJECT,1); ?>
+                        <?php echo $form->selectarray('srff-lineprojectfield',$extralabels_factureligne,$fastfactsupplier->params['extra_lineproject'],1,0,0,'',0,0,0,'','minwidth200',); ?>
                     </td>
                 </tr>                    
                 <?php endif; ?>
@@ -278,8 +260,8 @@ llxHeader('',$langs->trans('ffs_options_page_title'),'','','','',$array_js,$arra
             </tbody>
         </table>
 
-        <?php if(!$conf->global->SRFF_SHOWEXTRAFACTLINE || $conf->global->SRFF_SHOWEXTRAFACTLINE && empty($extralabels_factureligne)): ?>
-        <?php $valextra = ($conf->global->SRFF_EXTRAFACTLINE_PROJECT)?$conf->global->SRFF_EXTRAFACTLINE_PROJECT:'0'; ?>
+        <?php if(!$fastfactsupplier->params['show_extrafields_factureline'] || $fastfactsupplier->params['show_extrafields_factureline'] && empty($extralabels_factureligne)): ?>
+        <?php $valextra = ($fastfactsupplier->params['extra_lineproject'])?$fastfactsupplier->params['extra_lineproject']:'0'; ?>
             <input type="hidden" name="srff-lineprojectfield" value="<?php echo $valextra; ?>">
         <?php endif; ?>
         <div class="right pgsz-buttons" style="padding:16px 0;">

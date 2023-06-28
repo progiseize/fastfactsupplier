@@ -67,8 +67,9 @@ class modFastFactSupplier extends DolibarrModules
         $this->editor_url = 'https://www.progiseize.fr';
         
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-        $this->version = '2.7.3';
+        $this->version = '2.8.0';
         $this->url_last_version = "";
+
 
         // Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
         $this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
@@ -120,6 +121,7 @@ class modFastFactSupplier extends DolibarrModules
 
         // Config pages. Put here list of php page, stored into mymodule/admin directory, to use to setup module.
         $this->config_page_url = "setup.php@fastfactsupplier";
+
 
         // Dependencies
         $this->hidden = false;          // A condition to hide module

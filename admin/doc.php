@@ -27,12 +27,8 @@ require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 dol_include_once('./fastfactsupplier/lib/functions.lib.php');
 
-// POUR <= V10, ON INSTANCIE LES EXTRAFIELDS
-$version = explode('.', DOL_VERSION);
-if($version[0] <= 10): $extrafields = new ExtraFields($db); endif;
-
 // Protection if external user
-if ($user->societe_id > 0): accessforbidden(); endif;
+if ($user->socid > 0): accessforbidden(); endif;
 if(!$user->rights->fastfactsupplier->configurer): accessforbidden(); endif;
 
 /*******************************************************************
