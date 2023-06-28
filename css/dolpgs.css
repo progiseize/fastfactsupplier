@@ -16,10 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
  */
 
-/*
- * dolpgs - progiseize 1.4.1
-*/
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
 :root {
@@ -109,11 +105,20 @@
 
 /** TAGS **/
 .dolpgs-tag {padding: 3px 6px;border: 1px solid var(--colorprimary);box-sizing: border-box;border-radius: 4px;color: var(--colorprimary);text-decoration: none;text-transform: uppercase;font-weight: 600;font-size: 0.8em;font-family: 'Poppins', sans-serif;line-height: normal !important;display: inline-block;}
+.dolpgs-tag.tag-min {padding: 2px 4px;}
 .dolpgs-tag.tag-primary {border: 1px solid var(--colorprimary);color: var(--colorprimary);}
+.dolpgs-tag.tag-full-primary {border: 1px solid var(--colorprimary);background: var(--colorprimary);color:#fff;}
 .dolpgs-tag.tag-secondary {border: 1px solid var(--colorsecondary);color: var(--colorsecondary);}
+.dolpgs-tag.tag-full-secondary {border: 1px solid var(--colorsecondary);background: var(--colorsecondary);color:#fff;}
 .dolpgs-tag.tag-warning {border: 1px solid var(--colorwarning);color: var(--colorwarning);}
+.dolpgs-tag.tag-full-warning {border: 1px solid var(--colorwarning);background: var(--colorwarning);color:#fff;}
 .dolpgs-tag.tag-danger {border: 1px solid var(--colordanger);color: var(--colordanger);}
+.dolpgs-tag.tag-full-danger {border: 1px solid var(--colordanger);background: var(--colordanger);color:#fff;}
 .dolpgs-tag.tag-success {border: 1px solid var(--colorsuccess);color: var(--colorsuccess);}
+.dolpgs-tag.tag-full-success {border: 1px solid var(--colorsuccess);background: var(--colorsuccess);color:#fff;}
+.dolpgs-tag.tag-gray {border: 1px solid var(--colorgraylight3);color: var(--colorgraylight3);}
+.dolpgs-tag.tag-full-gray {border: 1px solid var(--colorgraylight3);background: var(--colorgraylight3);color:#fff;}
+.dolpgs-tag.tag-full-gray2 {border: 1px solid var(--colorgraylight2);background: var(--colorgraylight2);color:var(--colorgraylight3);}
 
 /** FLEX WRAPPER **/
 .dolpgs-flex-wrapper {display: flex;flex-wrap: wrap;margin: 0 -16px}
@@ -200,13 +205,17 @@ h3.dolpgs-table-title:before {display: inline-block;content: "";height: 14px;wid
 .dolpgs-table tbody tr.dolpgs-thead th.center {text-align: center;}
 .dolpgs-table tbody tr.dolpgs-thead th.right {text-align: right;}
 .dolpgs-table tbody tr.dolpgs-thead.vtop {vertical-align: top;}
+
 .dolpgs-table tbody tr.dolpgs-tbody {padding: 16px 12px;border: 1px solid var(--colorprimary);}
 .dolpgs-table tbody tr.dolpgs-tbody.withoutborder {border: none;}
 .dolpgs-table tbody tr.dolpgs-tbody td {padding: 12px;color: var(--colorprimary);font-family: 'Poppins',sans-serif;border-bottom:1px solid var(--colorgraylight2);}
+.dolpgs-table tbody tr.dolpgs-tbody.tbody-header td {color: var(--colorgraylight3);background: var(--colorfillgray);font-weight: 500;}
+.dolpgs-table tbody tr.dolpgs-tbody.tbody-total td {color: var(--colorgraylight3);background: var(--colorfillgray);font-weight: 500;}
 .dolpgs-table tbody tr.dolpgs-tbody.nopadding td{padding: 0;}
 .dolpgs-table tbody tr.dolpgs-tbody td.center {text-align: center;}
 .dolpgs-table tbody tr.dolpgs-tbody td.right {text-align: right;}
 .dolpgs-table tbody tr.dolpgs-tbody td input {font-family: 'Poppins',sans-serif;}
+.dolpgs-table tbody tr.dolpgs-tbody td textarea {font-family: 'Poppins',sans-serif;}
 .dolpgs-table tbody tr.dolpgs-tbody:last-child td {border-bottom: none !important;}
 .dolpgs-table tbody tr.dolpgs-tbody:hover {background: var(--colorfillgray) !important;}
 .dolpgs-table tbody tr.dolpgs-tbody.vtop {vertical-align: top;}

@@ -25,6 +25,8 @@
 .ffs-bold {font-weight: 600;}
 .ffs-bold .ff-amount {font-weight: 400;}
 
+.fastfact-textarea {width: 100%;max-width: 100%;resize: vertical;min-height: 64px;font-size: unset;}
+
 /* ERRORS */
 .ffs-fielderror {border-bottom: 1px solid var(--colordanger) !important;}
 .select2-selection.select2-selection--single.ffs-fielderror {border-bottom: 1px solid var(--colordanger);}

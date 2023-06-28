@@ -18,10 +18,8 @@
  
 jQuery(document).ready(function() {
 
-
 // //////////////////////////////////////////////////////////
 if (jQuery('body').hasClass('fastfactsupplier') && jQuery('body').hasClass('saisie')) {
-
 
     /*********************/
     /***** LANGUAGES *****/
@@ -74,25 +72,12 @@ if (jQuery('body').hasClass('fastfactsupplier') && jQuery('body').hasClass('sais
             jQuery('input[name="fournid"]').attr('value','');
         }
         
-        var numfacturl = jQuery(this).data('numfacturl');
-
-        jQuery.ajax({
-            url:numfacturl,
-            async: true,
-            method:'GET',
-            data:{tiers:data.id},
-            success:function(response){
-                jQuery('.txt-numfact').html('('+response+')');
-
-                var test_reffourn = jQuery('#creafact-reffourn').val();
-                if (test_reffourn !== "") {
-                    checkSupplierRef(jQuery('#creafact-reffourn').data('checkrefurl'),test_reffourn,dataset.fournid);
-                }
-            }
-        });
+        var test_reffourn = jQuery('#creafact-reffourn').val();
+        if (test_reffourn !== "") {
+            checkSupplierRef(jQuery('#creafact-reffourn').data('checkrefurl'),test_reffourn,dataset.fournid);
+        }
         
     });
-
 
     /*********************/
     /***** SUPPLIER REF *****/
@@ -208,8 +193,6 @@ if (jQuery('body').hasClass('fastfactsupplier') && jQuery('body').hasClass('sais
         jQuery(this).select2({placeholder: traductionTxt['ffs_infosgen_selectinlist'],containerCssClass: class_pdx,language: {noResults: function(){return traductionTxt['ffs_infosgen_selectnoresults'];}}});
     });
 
-    
-
     /*********************/
     // SELECT2 - LISTE
     jQuery('.ffs-slct').each(function(e){
@@ -304,6 +287,7 @@ if (jQuery('body').hasClass('fastfactsupplier') && jQuery('body').hasClass('sais
 
         calcul_totaux();
     });
+
     /*********************/
     // DROPZONE
     jQuery('#creafact-file').change(function () {
@@ -328,8 +312,6 @@ if (jQuery('body').hasClass('fastfactsupplier') && jQuery('body').hasClass('sais
       });
     jQuery('#zone-drop').on('dragover',function(e){ jQuery(this).addClass('dragged'); });
     jQuery('#zone-drop').on('dragleave',function(e){ jQuery(this).removeClass('dragged'); });
-
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////

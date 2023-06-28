@@ -1,14 +1,21 @@
 # FastFactSupplier
 
 [comment]: <> (TODO)
-[comment]: <> (Lang sur pages config)
-[comment]: <> (extrafields v15+)
-[comment]: <> (Extrafields : type unique ne fonctionnent pas)
-[comment]: <> (Extrafields : Prise en compte de la taille des champs)
 [comment]: <> (Verification des infos fournisseurs sur societeinfo ?)
 [comment]: <> (3.0 -> Interopérabilité ScanInvoice)
 
 ***
+### 2.8.0 (28/06/2023)
+* NEW - Add hook doActions
+* NEW - Add hook doMoreActions
+* NEW - Compatible extrafields unique
+* NEW - class FastFactSupplier, regroupe les paramètres et les fonctions utiles
+* FIX - Affichage du champ compte bancaire même si il n'y a pas de compte par défaut
+* MAJ - utilisation de dol_buildpath pour les appels aux scripts
+* MAJ - Mise au propre des variables GETPOST with filter, GetDolGlobalInt, GetDolGlobalString
+* MAJ - Amélioration globale du code
+* MAJ - Suppression ajax getNextNumRef, préférence pour une facture specimen
+
 ### 2.7.3 (08/06/2023)
 * FIX - Corrections noms variables functions.lib.php
 * MAJ - Taille minimum champ libellé, ref et dates

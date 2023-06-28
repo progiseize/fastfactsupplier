@@ -114,3 +114,5 @@ ffs_doc_options_cats_desc=2 modes différents:<ul><li>Utilisation d'une catégor
 ffs_doc_extra_uploadfile=Champ personnalisé "Fichier Joint"
 ffs_doc_extra_uploadfile_desc=Cette option créé un extrafield booléen (Oui/Non) qui sera rempli automatiquement si une pièce à été ajoutée à la facture (upload ou fichier lié).
 ffs_doc_options_customfields_desc=Uniquement les extrafields avec une visibilité 1 ou 3 seront affichés. Cette fonctionnalité ne prend pas en charge la vérification des champs uniques et leur utilisation peut provoquer l’impossibilté de créér des factures fournisseurs depuis le module.<br>(Des améliorations de prise en charge sont prévues dans les prochaines versions).
+ffs_fielderror_mustbeunique=Le champ '%s' doit être unique
+ffs_fielderror_emailnotvalid=L'adresse e-mail '%s' semble invalide
