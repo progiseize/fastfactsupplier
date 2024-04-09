@@ -572,9 +572,8 @@ if (empty($reshook)):
                 $facture_id = $facture->create($user); if($facture_id < 0): $error++; endif;
 
                 // BANK ACCOUNT
-                if($fastfactsupplier->params['default_bankaccount'] > 0 ): 
-                    if(intval($invoice_bank_account) > 0): $facture->setBankAccount($invoice_bank_account,false,$user); endif;
-                endif;
+                if(!empty($invoice_bank_account) && intval($invoice_bank_account) > 0): $facture->setBankAccount($invoice_bank_account,false,$user); endif;
+                
 
                 // PROJETS
                 if (!empty($conf->projet->enabled) && intval($invoice_project) > 0):

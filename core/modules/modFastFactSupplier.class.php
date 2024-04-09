@@ -53,7 +53,7 @@ class modFastFactSupplier extends DolibarrModules
         // It is used to group modules by family in module setup page
         $this->family = "Progiseize";
         // Module position in the family
-        $this->module_position = '03';
+        $this->module_position = '04';
         // Gives the possibility to the module, to provide his own family info and position of this family (Overwrite $this->family and $this->module_position. Avoid this)
         //$this->familyinfo = array('myownfamily' => array('position' => '001', 'label' => $langs->trans("MyOwnFamily")));
 
@@ -67,8 +67,8 @@ class modFastFactSupplier extends DolibarrModules
         $this->editor_url = 'https://www.progiseize.fr';
         
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-        $this->version = '2.8.0';
-        $this->url_last_version = "";
+        $this->version = '2.8.1';
+        $this->url_last_version ="https://progiseize.fr/modules_info/lastversion.php?module=".$this->numero;
 
 
         // Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
@@ -77,7 +77,7 @@ class modFastFactSupplier extends DolibarrModules
         // If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
         // If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
         $version = explode('.',DOL_VERSION);
-        if($version[0] > 16): $this->picto='fa-file-invoice-dollar_fas_#263c5c';
+        if($version[0] > 16): $this->picto='fa-file-invoice-dollar_fas_#6c6aa8';
         else: $this->picto='technic';
         endif;
         // Defined all module parts (triggers, login, substitutions, menus, css, etc...)

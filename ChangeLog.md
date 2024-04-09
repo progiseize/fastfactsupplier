@@ -5,6 +5,10 @@
 [comment]: <> (3.0 -> Interopérabilité ScanInvoice)
 
 ***
+### 2.8.1
+* FIX : Correction compte bancaire par défaut
+* MAJ : Position module modifiée
+
 ### 2.8.0 (28/06/2023)
 * NEW - Add hook doActions
 * NEW - Add hook doMoreActions
