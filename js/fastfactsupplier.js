@@ -214,11 +214,13 @@ if (jQuery('body').hasClass('fastfactsupplier') && jQuery('body').hasClass('sais
 
         // POUR CHAQUE LIGNE DE FACTURE
         jQuery('.linefact').each(function(e){ i++;
+
+            var ligne_qty = parseFloat(jQuery(this).find('.calc-qty').val().replace(',', '.')) || 0;
             var ligne_ht = parseFloat(jQuery(this).find('.calc-amount[data-mode="ht"]').val().replace(',', '.')) || 0;
             var ligne_ttc = parseFloat(jQuery(this).find('.calc-amount[data-mode="ttc"]').val().replace(',', '.')) || 0;
             var ligne_tva = parseFloat(jQuery(this).find('.calc-tva').val().replace(',', '.'));
-            calcul_ht += ligne_ht;
-            calcul_ttc += ligne_ttc;
+            calcul_ht += ligne_qty * ligne_ht;
+            calcul_ttc += ligne_qty * ligne_ttc;
         });
 
         calcul_tva = calcul_ttc - calcul_ht;
@@ -285,6 +287,11 @@ if (jQuery('body').hasClass('fastfactsupplier') && jQuery('body').hasClass('sais
             jQuery('#infofact-montantht-'+linenum).val(ml_calc.toFixed(2));
         }
 
+        calcul_totaux();
+    });
+
+    // LIGNE DE FACTURE - QTY
+    jQuery('#fastfact-tablelines').on('change','.calc-qty',function(e){
         calcul_totaux();
     });
 

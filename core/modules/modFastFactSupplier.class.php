@@ -67,7 +67,7 @@ class modFastFactSupplier extends DolibarrModules
         $this->editor_url = 'https://www.progiseize.fr';
         
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-        $this->version = '2.8.1';
+        $this->version = '2.9.0';
         $this->url_last_version ="https://progiseize.fr/modules_info/lastversion.php?module=".$this->numero;
 
 

@@ -114,6 +114,9 @@ endif;
 
             <?php endforeach;
         endif;  ?>
+    <?php //if(getDolGlobalInt('SRFF_USEQTY')): ?>
+        <td class=""><input type="number" step="any" name="infofact-qty-<?php echo GETPOST('viewnumber'); ?>" id="infofact-qty-<?php echo GETPOST('viewnumber'); ?>" class="calc-qty" data-linenum="<?php echo GETPOST('viewnumber'); ?>" value="1"></td>
+    <?php //endif; ?>
     <td class="<?php if($fastfactsupplier->params['mode_amount'] == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantht-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ht" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td>
     <td class="<?php if($fastfactsupplier->params['mode_amount'] == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" id="infofact-montantttc-<?php echo GETPOST('viewnumber'); ?>" class="calc-amount" value="" data-mode="ttc" data-linenum="<?php echo GETPOST('viewnumber'); ?>" /></td> 
     <td class="right">

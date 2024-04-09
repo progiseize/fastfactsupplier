@@ -195,6 +195,7 @@ for ($i=1; $i <= $invoice_nblines; $i++):
         'prodserv' => GETPOST('infofact-prodserv-'.$i), // ID if fastfactsupplier->params['use_categories_product'], label if not
         'montant_ligne_ht' => GETPOST('infofact-montantht-'.$i),
         'montant_ligne_ttc' => GETPOST('infofact-montantttc-'.$i),
+        'qty' => GETPOST('infofact-qty-'.$i),
         'taux_tva' => GETPOST('infofact-tva-'.$i,'int'),
         'extrafields' => array(),
     );
@@ -419,18 +420,31 @@ if (empty($reshook)):
                 break;
             endswitch;
 
+            // QTY
+            if (empty($line['qty'])): 
+                $error++; $calcul_line = false;
+                array_push($fastfactsupplier->errors, 'infofact-qty-'.$line['line_num']);
+                array_push($errmsg,$langs->transnoentities("ErrorFieldRequired", $langs->transnoentities('Quantity').' '.$line['line_num']));
+            endif;
+
             // ON RECALCULE LES MONTANTS 
             if($calcul_line):
+
+                $lineqty = floatval(str_replace(',', '.', $line['qty']));
                 switch ($line['type_saisie']):
                     case 'ht':
                         $ligne_ht_montant = floatval($post_montant);
                         $ligne_tva_montant = (floatval($post_montant)/100) * floatval($line['taux_tva']);
-                        $calcul_ht += $ligne_ht_montant;  $calcul_tva += $ligne_tva_montant;  $calcul_ttc += $ligne_ht_montant + $ligne_tva_montant;
+                        $calcul_ht += $ligne_ht_montant * $lineqty; 
+                        $calcul_tva += $ligne_tva_montant * $lineqty; 
+                        $calcul_ttc += $ligne_ht_montant + $ligne_tva_montant;
                     break;
                     case 'ttc':
                         $ligne_ttc_montant = floatval($post_montant);
                         $ligne_ht_montant = $ligne_ttc_montant / (1 + floatval($line['taux_tva']) / 100);
-                        $calcul_ht += $ligne_ht_montant; $calcul_tva += $ligne_ttc_montant - $ligne_ht_montant; $calcul_ttc += $ligne_ttc_montant;
+                        $calcul_ht += $ligne_ht_montant * $lineqty;
+                        $calcul_tva += ($ligne_ttc_montant * $lineqty) - ($ligne_ht_montant * $lineqty);
+                        $calcul_ttc += $ligne_ttc_montant * $lineqty;
                     break;
                 endswitch;                        
             endif;
@@ -616,13 +630,14 @@ if (empty($reshook)):
                     endswitch;
 
                     $ligne_tva = number_format(floatval($line['taux_tva']),3,'.','');
+                    $ligne_qty = floatval($line['qty']);
 
                     if($fastfactsupplier->params['use_categories_product']): $ligne_fk_product = $line['prodserv']; $ligne_description = '';
                     else: $ligne_fk_product = 0; $ligne_description = $line['prodserv'];
                     endif;
 
                     // ON AJOUTE LA LIGNE
-                    if($id_ligne = $facture->addline($ligne_description,$montant_ligne,$ligne_tva,0,0,1,$ligne_fk_product,0,'','',0,'',strtoupper($typesaisie_ligne),1,-1,false,'',null,0,0)):
+                    if($id_ligne = $facture->addline($ligne_description,$montant_ligne,$ligne_tva,0,0,$ligne_qty,$ligne_fk_product,0,'','',0,'',strtoupper($typesaisie_ligne),1,-1,false,'',null,0,0)):
                     
                         $lines_ok++;
                         $facture_ligne->fetch($id_ligne);
@@ -859,7 +874,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',$array_js,$ar
                                 <textarea id="options_<?php echo $key_extrafield; ?>" name="options_<?php echo $key_extrafield; ?>" class="flat fastfact-textarea <?php echo $class_extrafield; ?> type-<?php echo $type_extrafield; ?>"></textarea>
                             </td>
                         <?php else: 
-                            if(in_array($type_extrafield, array('int','double','price'))): $value_extrafield = str_replace(',','.',$value_extrafield); var_dump('a'); endif; ?> 
+                            if(in_array($type_extrafield, array('int','double','price'))): $value_extrafield = str_replace(',','.',$value_extrafield); endif; ?> 
                             <td class="dolpgs-font-medium"><?php echo $label_extrafield; echo $required_extrafield?' <span class="required">*</span>':''; ?></td>
                             <td class="right"><?php echo $extrafields->showInputField($key_extrafield,$value_extrafield,'','','',$class_extrafield,$facture->id,$facture->table_element); ?></td>
                         <?php endif; ?> 
@@ -885,6 +900,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',$array_js,$ar
                             </th>
                         <?php endforeach;
                     endif; ?>
+                    <th><?php echo $langs->trans('Quantity'); ?></th>
                     <th class="<?php if($fastfactsupplier->params['mode_amount'] == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><?php echo $langs->transnoentities('ffs_details_amountht'); ?> <span class="required">*</span></th>
                     <th class="<?php if($fastfactsupplier->params['mode_amount'] == 'ht'): echo 'fastfact-hidden'; endif; ?>"><?php echo $langs->transnoentities('ffs_details_amountttc'); ?> <span class="required">*</span></th>
                     <th class="right"><?php echo $langs->transnoentities('ffs_details_amounttax'); ?> <span class="required">*</span></th>
@@ -915,6 +931,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',$array_js,$ar
 
                             <?php endforeach; ?>
                         <?php endif; ?>
+                        <td class="pgsz-optiontable-field"><input type="number" step="any" name="infofact-qty-1" id="infofact-qty-1" class="calc-qty" data-linenum="1" value="1"></td>
                         <td class="pgsz-optiontable-field <?php if($fastfactsupplier->params['mode_amount'] == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-1" id="infofact-montantht-1" class="calc-amount" value="" data-mode="ht" data-linenum="1"/></td>
                         <td class="pgsz-optiontable-field <?php if($fastfactsupplier->params['mode_amount'] == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-1" id="infofact-montantttc-1" class="calc-amount" value="" data-mode="ttc" data-linenum="1"/></td>
                         <td class="pgsz-optiontable-field right">
@@ -945,6 +962,7 @@ llxHeader('',$langs->transnoentities('ffs_page_title'),'','','','',$array_js,$ar
 
                             <?php endforeach; ?>
                         <?php endif; ?>
+                        <td class="pgsz-optiontable-field"><input type="number" step="any" name="infofact-qty-<?php echo $line['line_num']; ?>" id="infofact-qty-<?php echo $line['line_num']; ?>" class="calc-qty" data-linenum="<?php echo $line['line_num']; ?>" value="<?php echo $line['qty']; ?>"></td>
                         <td class="pgsz-optiontable-field <?php if($fastfactsupplier->params['mode_amount'] == 'ttc'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantht-<?php echo $line['line_num']; ?>" id="infofact-montantht-<?php echo $line['line_num']; ?>" class="calc-amount <?php echo $fastfactsupplier->is_fielderror('infofact-montantht-'.$line['line_num'],$fastfactsupplier->errors); ?>" value="<?php echo $line['montant_ligne_ht']; ?>" data-mode="ht" data-linenum="<?php echo $line['line_num']; ?>" /></td>
                         <td class="pgsz-optiontable-field <?php if($fastfactsupplier->params['mode_amount'] == 'ht'): echo 'fastfact-hidden'; endif; ?>"><input type="text" name="infofact-montantttc-<?php echo $line['line_num']; ?>" id="infofact-montantttc-<?php echo $line['line_num']; ?>" class="calc-amount <?php echo $fastfactsupplier->is_fielderror('infofact-montantttc-'.$line['line_num'],$fastfactsupplier->errors); ?>" value="<?php echo $line['montant_ligne_ttc']; ?>" data-mode="ttc" data-linenum="<?php echo $line['line_num']; ?>" /></td>    
                         <td class="right">
