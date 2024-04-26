@@ -5,6 +5,9 @@
 [comment]: <> (3.0 -> Interopérabilité ScanInvoice)
 
 ***
+### 2.9.1
+* FIX - Remove module descriptor url_last_version
+
 ### 2.9.0
 * NEW : Qty field
 
