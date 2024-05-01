@@ -5,6 +5,9 @@
 [comment]: <> (3.0 -> Interopérabilité ScanInvoice)
 
 ***
+### 2.9.2
+* MAJ - Remove old menu "Progiseize"
+
 ### 2.9.1
 * FIX - Remove module descriptor url_last_version
 

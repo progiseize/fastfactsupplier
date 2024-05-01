@@ -67,7 +67,7 @@ class modFastFactSupplier extends DolibarrModules
         $this->editor_url = 'https://www.progiseize.fr';
         
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-        $this->version = '2.9.1';
+        $this->version = '2.9.2';
         //$this->url_last_version ="https://progiseize.fr/modules_info/lastversion.php?module=".$this->numero;
 
 
@@ -260,68 +260,6 @@ class modFastFactSupplier extends DolibarrModules
         else: 
             $this->menu[$r]=array('fk_menu'=>'fk_mainmenu=accountancy,fk_leftmenu=suppliers_bills','type'=>'left','titre'=>'Saisie Rapide Factures Fournisseurs','mainmenu'=>'','leftmenu'=>'','url'=>'/fastfactsupplier/','langs'=>'fastfactsupplier@fastfactsupplier','position'=>1,'enabled'=> '$conf->fastfactsupplier->enabled','perms'=> '$user->rights->fastfactsupplier->saisir', 'target'=>'','user'=>2);
         endif;       
-        $r++;
-
-        $this->menu[$r]=array( 
-            'fk_menu'=>'fk_mainmenu=progiseize',
-            'type'=>'left',
-            'titre'=> $this->name,
-            'mainmenu'=>'progiseize',
-            'leftmenu'=> $this->rights_class,
-            'url'=>'/fastfactsupplier/index.php',
-            'langs'=>'progiseize@progiseize',
-            'position'=> $this->module_position, 'enabled'=>'1',
-            'perms'=>'1','target'=>'', 'user'=>2,
-            'prefix' => '<span class="fas fa-file-invoice-dollar" style="color: #6c6aa8;margin-right:3px;"></span> '
-        );
-        $r++;
-
-        $this->menu[$r]=array(
-            'fk_menu'=>'fk_mainmenu=progiseize,fk_leftmenu='.$this->rights_class,
-            'type'=>'left',
-            'titre'=>'Saisie Rapide Factures Fournisseurs',
-            'mainmenu'=>'',
-            'leftmenu'=>'',
-            'url'=>'/fastfactsupplier/index.php',
-            'langs'=>'fastfactsupplier@fastfactsupplier',
-            'position'=> $this->module_position + 1,
-            'enabled'=> '$conf->fastfactsupplier->enabled',
-            'perms'=> '$user->rights->fastfactsupplier->saisir',
-            'target'=>'',
-            'user'=>2
-        );
-        $r++;
-
-        $this->menu[$r]=array(
-            'fk_menu'=>'fk_mainmenu=progiseize,fk_leftmenu='.$this->rights_class,
-            'type'=>'left',
-            'titre'=>'Ajouts de comptes comptables',
-            'mainmenu'=>'',
-            'leftmenu'=>'',
-            'url'=>'/fastfactsupplier/admin/insert.php',
-            'langs'=>'fastfactsupplier@fastfactsupplier',
-            'position'=> $this->module_position + 2,
-            'enabled'=> '$conf->fastfactsupplier->enabled',
-            'perms'=> '$user->rights->fastfactsupplier->saisir',
-            'target'=>'',
-            'user'=>2
-        );
-        $r++;
-
-        $this->menu[$r]=array(
-            'fk_menu'=>'fk_mainmenu=progiseize,fk_leftmenu='.$this->rights_class,
-            'type'=>'left',
-            'titre'=>'Configurer',
-            'mainmenu'=>'',
-            'leftmenu'=>'',
-            'url'=>'/fastfactsupplier/admin/setup.php',
-            'langs'=>'fastfactsupplier@fastfactsupplier',
-            'position'=> $this->module_position + 3,
-            'enabled'=> '$conf->fastfactsupplier->enabled',
-            'perms'=> '$user->rights->fastfactsupplier->configurer',
-            'target'=>'',
-            'user'=>2
-        );
         $r++;
 
 
